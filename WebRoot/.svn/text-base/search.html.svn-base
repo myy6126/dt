@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>FindException工具</title>
+<style>
+body{ margin:0;background-color:#F0F0F0; position:relative; background-color:#2d3e50;}
+input{ background-color: null; margin:0; padding:0}
+
+span{ display:block}
+.ibeinfo .span_input{ width:25px;}
+.hasinfo .span_input{ width:25px;}
+html,body{ 
+margin:0px; 
+height:100%; 
+} 
+.write{ background-color:#FFF}
+
+
+/*******   a标签      ***********/
+.a_menu_query{color:#FFF; font-family:微软雅黑; font-weight:bold;display:block; text-decoration:none; width:45px;font-size:21px; position:absolute; left:145px; top:150px}
+
+.a_menu_add{ color:#FFF; font-family:微软雅黑; font-weight:bold;display:block; text-decoration:none; width:45px;font-size:21px;position:absolute; left:145px; top:150px}
+
+.a_menu_update{ color:#FFF; font-family:微软雅黑; font-weight:bold;display:block; text-decoration:none; width:45px;font-size:21px;position:absolute; left:145px; top:200px}
+
+.a_menu_delete{ color:#FFF; font-family:微软雅黑; font-weight:bold;display:block; text-decoration:none; width:45px;font-size:21px;position:absolute; left:145px; top:250px}
+
+.a_menu_search{ color:#FFF; font-family:微软雅黑; display:block; text-decoration:none; width:74px;font-size:18px;position:absolute; left:130px; top:150px; font-weight:bold}
+
+.a_menu_localsearch{ color:#FFF; font-family:微软雅黑;display:block; text-decoration:none; width:74px;font-size:18px;position:absolute; left:130px; top:200px; font-weight:bold}
+
+
+.a_menu_div{ width:100px; height:300px; padding-left:221px; float:left}
+
+.a_menu_delete:hover{ border-bottom:1px solid #FFF}
+.a_menu_search:hover{ border-bottom:1px solid #FFF}
+.a_menu_localsearch:hover{ border-bottom:1px solid #FFF}
+
+.a_right{ margin-top:50px; border-bottom:3px solid #2d3e50; width:800px; overflow:auto}
+
+.a_queryall{font-family:微软雅黑; font-weight:bold; display:block; float:right; margin-left:20px; text-decoration:none; color:#2d3e50; margin-top:2px}
+.a_queryall:hover{border-bottom:1px solid #2d3e50}
+
+
+.a_index{ font-family:微软雅黑; font-weight:bold;display:block; float:right; margin-left:20px;text-decoration:none;color:#2d3e50; margin-top:2px; margin; left:705px; top:54px; position:absolute}
+.a_config{ left:785px; top:54px; position:absolute; font-family:微软雅黑; font-weight:bold;display:block; float:right; margin-left:20px;text-decoration:none;color:#2d3e50; margin-top:2px}
+.a_config:hover{border-bottom:1px solid #2d3e50}
+.a_index:hover{border-bottom:1px solid #2d3e50}
+
+/**********        左右模块   ******************/
+
+.bigleft{ float:left; width:320px; position:absolute;}
+.bigright{ float:left; width:980px;  margin-left:320px;position:absolute; background-color:#F0F0F0; padding-left:70px; overflow:auto; height:100%}
+
+/*** 左侧主标题     ******************/
+.maintitle{ float:left; font-family:微软雅黑; font-size:26px; color:#ededef; margin-left:90px; margin-top:50px; font-weight:bold; margin-bottom:20px}
+
+/*******    input标签     ***************/
+.a_right input{ margin-left:10px;}
+.a_right{ height:30px; margin-bottom:18px; width:800px}
+
+/********** 右侧服务器信息  **********/
+.searchinfo{ overflow:auto; margin-bottom:30px; width:620px; margin-left:0px; margin-top:52px}
+.span_cha{ width:26px; height:26px; cursor:pointer; position:absolute; left:546px; top:55px; }
+
+.span_cha_none{ display:none}
+.searchresult{ overflow:hidden; width:800px ; height:400px; background-color:white; border:solid 1px #999999;}
+.input_search{ border: none; width:468px; height:18px; font-size:14px; padding:6px 6px; float:left; border: solid 1px #999999; border-right:none; padding-right:29px; background-image:url(imgs/search/chajing.jpg); background-repeat:no-repeat; background-position:479px 9px;}
+.input_search:hover{border: solid 1px #597b9e; border-right:none;}
+.input_search_none:hover{border: solid 1px #597b9e; border-right:none;}
+.input_search_none{border: none; width:468px; height:18px; font-size:14px; padding:6px 6px; float:left; border: solid 1px #999999; border-right:none; padding-right:29px;}
+.span_cha_over{width:26px; height:26px; cursor:pointer; position:absolute; left:546px; top:55px;background-image:url(imgs/search/chahover.jpg);background-repeat:no-repeat; background-position:479px 9px;}
+
+.span_cha:hover{background-image:url(imgs/search/chahover.jpg);background-repeat:no-repeat; background-position:4px 7px}
+
+.input_button{ border:none; width:100px; height:32px; font-size:14px; background-color:#597b9e; float:left; color:#F0F0F0;  word-spacing:8px; letter-spacing: 1px;}
+
+
+</style>
+<script type="text/javascript" src="jquery/jquery-1.7.2.min.js"></script>
+<script type="text/javascript">
+		
+		$(function(){
+			if($("#input_search").val()==""){
+				$("#input_search").addClass("input_search_none");
+				$("#input_search").removeClass("input_search");
+				$("#span_cha").addClass("span_cha_none");
+				$("#span_cha").removeClass("span_cha");
+			}else if($("#input_search").val()!=""){
+				$("#input_search").addClass("input_search");
+		     	$("#input_search").removeClass("input_search_none");
+				$("#span_cha").addClass("span_cha");
+				$("#span_cha").removeClass("span_cha_none");
+			}
+			})
+		
+			// Firefox, Google Chrome, Opera, Safari, Internet Explorer from version 9 实时监听input框事件
+        function OnInput (event) {
+            if($("#input_search").val()==""){
+				$("#input_search").addClass("input_search_none");
+				$("#input_search").removeClass("input_search");
+				$("#span_cha").addClass("span_cha_none");
+				$("#span_cha").removeClass("span_cha");
+			}else if($("#input_search").val()!=""){
+				$("#input_search").addClass("input_search");
+		     	$("#input_search").removeClass("input_search_none");
+				$("#span_cha").addClass("span_cha");
+				$("#span_cha").removeClass("span_cha_none");
+			}
+        }
+		// Internet Explorer 实时监听input框事件
+       /*  function OnPropChanged (event) {
+           if($("#input_search").val()==""){
+				$("#input_search").addClass("input_search_none");
+				$("#input_search").removeClass("input_search");
+				$("#span_cha").addClass("span_cha_none");
+				$("#span_cha").removeClass("span_cha");
+			}else if($("#input_search").val()!=""){
+				$("#input_search").addClass("input_search");
+		     	$("#input_search").removeClass("input_search_none");
+				$("#span_cha").addClass("span_cha");
+				$("#span_cha").removeClass("span_cha_none");
+			}
+       }  */ 
+   	// Internet Explorer 实时监听input框事件
+       /* function OnPropChanged (event) {
+          if($("#input_search").val()==""){
+				$("#input_search").addClass("input_search_none");
+				$("#input_search").removeClass("input_search");
+				$("#span_cha").addClass("span_cha_none");
+				$("#span_cha").removeClass("span_cha");
+			}else if($("#input_search").val()!=""){
+				$("#input_search").addClass("input_search");
+		     	$("#input_search").removeClass("input_search_none");
+				$("#span_cha").addClass("span_cha");
+				$("#span_cha").removeClass("span_cha_none");
+			}
+      }  */ 
+		// 删除input内容
+		function input_clean(){
+			$("#input_search").addClass("input_search_none");
+			$("#input_search").removeClass("input_search");
+			$("#span_cha").addClass("span_cha_none");
+			$("#span_cha").removeClass("span_cha");
+			$("#input_search").val("");
+	 }
+</script>
+</head>
+
+<body>
+ 
+	
+    
+    	 <!--  左边  -->
+    
+    	<div class="bigleft">
+        	<div class="maintitle">本地异常查询</div>
+            <div class="a_menu_div"><a class="a_menu_search" href="index.jsp">异常检索</a>
+                <a class="a_menu_localsearch" href="config.jsp">后台配置</a>
+            </div>
+        </div>
+        
+        <!--  右边  -->
+        
+          <div class="bigright">
+         		<a class="a_index" href="index.jsp">异常查询</a>
+                <a class="a_config" href="config.html">后台配置</a>
+            <div class="searchinfo">
+            	<span onclick="input_clean()" id="span_cha" ></span>
+            	<input oninput="OnInput (event)" onpropertychange="OnPropChanged (event)" id="input_search" class="input_search" type="text"/>
+               
+                <input class="input_button" type="button" value="本地搜索" />
+            </div>
+            
+            <div class="searchresult">
+            
+            </div>
+            
+            
+            
+          </div>
+     </div>
+</body>
+</html>

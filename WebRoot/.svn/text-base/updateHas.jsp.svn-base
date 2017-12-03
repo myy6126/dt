@@ -1,0 +1,107 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>新增ipServer信息</title>
+<style>
+/********  init  ********************************/
+body{ margin:0;background-color:#F0F0F0; position:relative; font-family:微软雅黑; color:#2d3e50; font-size:16px; font-weight:bold}
+input{ margin:0; width:120px; height:20px}
+span{ display:block}
+
+
+.head{ margin-top:30px; border-bottom:3px solid #2d3e50; height:30px; width:750px; margin-left:30px}
+/*******  body  **********************/
+.tbody{ width:360px; overflow:hidden; margin-left:196px}
+
+.sleft{ width:150px; overflow:auto; float:left; height:30px; text-align:right}
+.sright{ width:150px; overflow:auto; float:right;height:30px; text-align:left}
+.sright input{ height:26px}
+.ibeinfo { overflow:auto; margin-top:30px}
+.ibeinfo div{ overflow:auto; width:310px; margin-top:10px}
+.remark div{overflow:auto; width:310px}
+.hasinfo div{overflow:auto; width:310px}
+.s_button{ overflow:auto; width:310px; margin-left:30px; margin-top:20px}
+.s_button input{  width:60px; height:35px; font-family:微软雅黑; font-size:16px; font-weight:bold; color:#333;}
+
+.l_title{ text-align:center; margin-bottom:20px;margin-top:20px}
+
+
+/*****   foot       ************************/
+.foot{ margin-top:40px; border-bottom:3px solid #2d3e50; width:750px; margin-left:30px; margin-bottom:60px}
+
+/** 提示信息 **/
+.prompt{ font-size: 12px; color: red; width: 380px;height: 30xp; margin-left:50px}
+
+
+</style>
+<script type="text/javascript" src="/jquery/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="/jquery/form/jquery.form.js"></script>
+<script type="text/javascript">
+$("#updateForm").ajaxForm({
+	 contentType:"application/x-www-form-urlencoded; charset=utf-8", 
+	 beforeSubmit:function(){
+		// 校验
+		return true;
+	}, 
+	success:function(jsonObject){
+		if(jsonObject.success){
+			alert("提交成功!");
+			//刷新父窗口
+			window.opener.location.reload();
+			 window.open("","_self");    
+			 window.close(); 
+		}else{
+		}
+	}
+})
+
+	
+</script>
+</head>
+
+<body>
+	<form id="updateForm" action="doUpdateHas.action" method="post">
+
+    <div class="head">
+        修改
+    </div>
+    <div class="tbody">
+       <div class="ibeinfo">
+       		<div>
+            	<span class="sleft">ip</span>
+                <span class="sright"><input type="text" name="infoVO.ip" value="${infoVO.ip}"/></span>
+            </div>
+            <div>
+            	<span class="sleft">用户名</span>
+                <span class="sright"><input type="text" name="infoVO.username" value="${infoVO.username}"/></span>
+            </div>
+            <div>
+            	<span class="sleft">密码</span>
+                <span class="sright"><input type="text" name="infoVO.password" value="${infoVO.password}"/></span>
+            </div>
+            <div>
+            	<span class="sleft">主机日志路径</span>
+                <span class="sright"><input type="text" name="infoVO.path" value="${infoVO.path}"/></span>
+            </div>
+            <div>
+            	<span class="sleft">SIH日志路径</span>
+                <span class="sright"><input type="text" name="infoVO.sihPath" value="${infoVO.sihPath}"/></span>
+            </div>
+            <input type="hidden" name="infoVO.id" value="${infoVO.id}"/>
+       </div>
+             
+       <div class="s_button">
+       		<span class="sleft" style=" height:40px"><input type="submit" value="提交"/></span>
+                <span class="sright" style=" height:40px"><input type="button" value="返回" /></span>
+       </div>
+   </div>
+	<div class="prompt">提示 : 添加多个路径请用@隔开</div>
+    <div class="prompt">例 : /etlog/log/ibe/server@/etlog/log/ibe2/server</div>
+	<div class="foot">
+    </div>
+    
+</form>
+</body>
+</html>

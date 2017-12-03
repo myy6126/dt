@@ -1,0 +1,218 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>新增ipServer信息</title>
+<style>
+/********  init  ********************************/
+body{ margin:0;background-color:#F0F0F0; position:relative; font-family:微软雅黑; color:#2d3e50; font-size:16px; font-weight:bold}
+input{ margin:0; width:120px; height:20px}
+span{ display:block}
+
+
+.head{ margin-top:30px; border-bottom:3px solid #2d3e50; height:30px; width:750px; margin-left:30px}
+/*******  body  **********************/
+.tbody{ width:360px; overflow:hidden; margin-left:196px; text-align:center}
+
+.sleft{ width:150px; overflow:auto; float:left; height:30px; text-align:right}
+.sright{ width:150px; overflow:auto; float:right;height:30px; text-align:left}
+.ibeinfo div{ overflow:auto; width:310px;;}
+.ibeinfo { overflow:auto; height:120px; padding-top:10px; border-top:solid 1px #999}
+.hasinfo { overflow:auto; height:150px; padding-top:10px; border-top:solid 1px #999}
+.remark div{overflow:auto; width:310px}
+.hasinfo div{overflow:auto; width:310px}
+.s_button{ overflow:auto; width:310px; margin-left:30px; margin-top:20px}
+.s_button input{  width:60px; height:35px; font-family:微软雅黑; font-size:16px; font-weight:bold; color:#333;}
+
+.l_title{ text-align:center; margin-bottom:20px;margin-top:20px}
+.bigibeinfo{ overflow:hidden; text-align:center}
+
+/*添加*/
+.add{ cursor:pointer; font-size:14px; margin-top:10px; display:block; color:red; width:60px; margin-left:150px}
+.bighasinfo{ overflow:auto; text-align:center}
+/*删除*/
+.deletea{cursor:pointer; display:block;font-size:14px; margin-bottom:10px;margin-left:166px; width:30px}
+/*****   foot       ************************/
+.foot{ margin-top:40px; border-bottom:3px solid #2d3e50; width:750px; margin-left:30px; margin-bottom:60px}
+/** 提示信息 **/
+.prompt{ font-size: 12px; color: red; width: 380px;height: 30xp; margin-left:50px; margin-top:10px}
+
+</style>
+<script type="text/javascript" src="/jquery/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="/jquery/form/jquery.form.js"></script>
+<script type="text/javascript">
+	
+	
+	var num = 1
+	function addibe(){	
+		if(num<=10){
+			num++;
+			var info ='ibeInfo'+num;
+			var infod = info + "d";
+			var info1 = "\""+info+"\""
+			$("#bigibeinfo").append("<div class='ibeinfo' id='"+info+"'><div><span class='sleft'>ip</span> <span class='sright'><input type='text' id='ibeIp"+num+"' name='infosVO."+info+".ip' /></span></div><div><span class='sleft'>用户名</span><span class='sright'><input type='text' id='ibeUsername"+num+"' name='infosVO."+info+".username'/></span></div><div><span class='sleft'>密码</span><span class='sright'><input type='text' id='ibePassword"+num+"' name='infosVO."+info+".password'/></span></div><div><span class='sleft'>路径</span><span class='sright'><input id='ibePath"+num+"' type='text' name='infosVO."+info+".path'/></span></div></div><a class='deletea' id='"+infod+"' onClick='deletea("+info1+")'>删除</a>");
+		}
+	}
+	
+	 function deletea(dname){
+		  var ddname=dname+"d";
+		  $("#"+dname+"").remove();
+		  $("#"+ddname+"").remove();
+	 }
+	 
+	 function addhas(){	
+		 if(num<=10){
+			num++;
+			var info ='hasInfo'+num;
+			var infod = info + "d";
+			var info1 = "\""+info+"\""
+			$("#bighasinfo").append("<div class='hasinfo' id='"+info+"'><div><span class='sleft'>ip</span> <span class='sright'><input type='text' id='hasIp"+num+"' name='infosVO."+info+".ip'/></span></div><div><span class='sleft'>用户名</span><span class='sright'><input id='hasUsername"+num+"' type='text' name='infosVO."+info+".username' /></span></div><div><span class='sleft'>密码</span><span class='sright'><input id='hasPassword"+num+"' type='text'  name='infosVO."+info+".password'/></span></div><div><span class='sleft'>主机日志路径</span><span class='sright'><input id='hasPath"+num+"' type='text' name='infosVO."+info+".path' /></span></div><div><span class='sleft'>SIH日志路径</span><span class='sright'><input id='hasSihPath"+num+"' type='text' name='infosVO."+info+".sihPath' /></span></div></div><a class='deletea' id='"+infod+"' onClick='deletea("+info1+")'>删除</a>");
+		 }
+	}
+	 $("#addForm").ajaxForm({
+		 contentType:"application/x-www-form-urlencoded; charset=utf-8", 
+		 beforeSubmit:function(){
+			// 校验
+			if($("#serverName").val()==""){
+				alert("服务器名称不能为空!")
+				return false;
+			}
+			if($("#serverIp").val()==""){
+				alert("服务器ip不能为空!")
+				return false;
+			}
+			for(var i=0;i<=num;i++){
+				if($("#ibeIp"+i+"").val()==""){
+					alert("IBE的IP不能为空")
+					return false;
+				}
+				if($("#ibeUsername"+i+"").val()==""){
+					alert("IBE的用户名不能为空")
+					return false;
+				}
+				if($("#ibePassword"+i+"").val()==""){
+					alert("IBE的密码不能为空")
+					return false;
+				}
+				if($("#ibePath"+i+"").val()==""){
+					alert("IBE的路径不能为空")
+					return false;
+				}
+				if($("#hasIp"+i+"").val()==""){
+					alert("HAS的IP不能为空")
+					return false;
+				}
+				if($("#hasUsername"+i+"").val()==""){
+					alert("HAS的用户名不能为空")
+					return false;
+				}
+				if($("#hasPassword"+i+"").val()==""){
+					alert("HAS的密码不能为空")
+					return false;
+				}
+				if($("#hasPath"+i+"").val()==""){
+					alert("HAS的Path不能为空")
+					return false;
+				} 
+			}
+			return true;
+		}, 
+		success:function(jsonObject){
+			if(jsonObject.success){
+				$("#msg").html("提交成功!");
+				alert("提交成功!")
+				// 刷新父窗口
+				window.opener.location.reload();
+				 window.open("","_self");    
+				 window.close(); 
+			}else{
+				$("#msg").html("提交失败!");
+			}
+		}
+	 })
+	
+</script>
+</head>
+
+<body>
+
+<form id="addForm" action="config/addAll.action" method="post">
+    <div class="head">
+        新增
+    </div>
+    <div class="msg" id="msg"></div>
+    <div class="tbody">
+    <div class="l_title">用户组</div>
+       <div class="remark">
+       		<div>
+            	<span class="sleft">服务器名称</span>
+                <span class="sright"><input type="text" id="serverName" name="infosVO.ipServerInfo.serverName"/></span>
+            </div>
+            <div>
+            	<span class="sleft">服务器IP</span>
+                <span class="sright"><input type="text" id="serverIp" name="infosVO.ipServerInfo.serverIp"/></span>
+            </div>
+       </div>
+       <div class="l_title">IBE信息</div>
+       <div class="bigibeinfo" id="bigibeinfo">
+       <div class="ibeinfo" id="ibeInfo0">
+       		<div>
+            	<span class="sleft">ip</span>
+                <span class="sright"><input type="text" id="ibeIp0" name="infosVO.ibeInfo1.ip"/></span>
+            </div>
+            <div>
+            	<span class="sleft">用户名</span>
+                <span class="sright"><input type="text" id="ibeUsername0" name="infosVO.ibeInfo1.username"/></span>
+            </div>
+            <div>
+            	<span class="sleft">密码</span>
+                <span class="sright"><input type="text" id="ibePassword0" name="infosVO.ibeInfo1.password"/></span>
+            </div>
+            <div>
+            	<span class="sleft">路径</span>
+                <span class="sright"><input type="text" id="ibePath0" name="infosVO.ibeInfo1.path"/></span>
+            </div>
+       </div>
+      
+      </div>
+       <a class="add" onClick="addibe()">添加一项</a>
+              <div class="l_title">HAS信息</div>
+       <div id="bighasinfo" class="bighasinfo">
+       <div class="hasinfo" id="hasInfo0">
+       	 <div>
+            	<span class="sleft">ip</span>
+                <span class="sright"><input type="text" id="hasIp0" name="infosVO.hasInfo1.ip"/></span>
+            </div>
+             <div>
+            	<span class="sleft">用户名</span>
+                <span class="sright"><input type="text" id="hasUsername0" name="infosVO.hasInfo1.username"/></span>
+             </div>
+             <div>
+            	<span class="sleft">密码</span>
+                <span class="sright"><input type="text" id="hasPassword0" name="infosVO.hasInfo1.password"/></span>
+            </div>
+            <div>
+            	<span class="sleft">主机日志路径</span>
+                <span class="sright"><input type="text" id="hasPath0" name="infosVO.hasInfo1.path"/></span>
+            </div>
+            <div>
+            	<span class="sleft">SIH日志路径</span>
+                <span class="sright"><input type="text" id="hasSihPath0" name="infosVO.hasInfo1.sihPath"/></span>
+            </div>
+       </div>
+      
+       </div>
+        <a class="add" onClick="addhas()">添加一项</a>
+       <div class="s_button">
+       		<span class="sleft" style=" height:40px"><input type="submit" value="提交"/></span>
+                <span class="sright" style=" height:40px"><input type="reset" value="重填" /></span>
+       </div>
+   </div>
+	<div class="prompt">提示 : 添加多个路径请用@隔开</div>
+    <div class="prompt">例 : /etlog/log/ibe/server@/etlog/log/ibe2/server</div>
+	<div class="foot">
+    </div>
+</form>
+</body>
+</html>

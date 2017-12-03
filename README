@@ -1,0 +1,10 @@
+1	基础模块	icon-leaf			0
+11	学生管理		/stu/index.action	stu/add.action,stu/toEdit.action,stu/doEdit.action,update/add.action	1
+2	权限模块	icon-user			0
+21	用户管理		/user/index.action	user/add.action,user/toEdit.action,user/doEdit.action,user/update.action	2
+22	角色管理		/role/index.action	role/add.action,role/toEdit.action,role/doEdit.action,role/update.action	2
+23	权限管理		/permission/index.action	permission/add.action,permission/delete.action,permission/toEdit.action,permission/doEdit.action,permission/update.action	2
+3	日志模块	icon-list			0
+31	日志管理		/operationlog/index.action	operationlog/add.action,operationlog/delete.action,operationlog/toEdit.action,operationlog/doEdit.action,operationlog/update.action	3
+4	公告模块	icon-envelope			0
+41	公告管理		/announcement/index.action	announcement/add.action,announcement/delete.action,announcement/toEdit.action,announcement/doEdit.action,announcement/update.action	4

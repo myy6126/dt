@@ -1,0 +1,386 @@
+package com.travelsky.fe.action;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.apache.log4j.Logger;
+import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.Namespace;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
+
+import com.travelsky.fe.VO.InfoVO;
+import com.travelsky.fe.exception.MyException;
+import com.travelsky.fe.model.HasInfo;
+import com.travelsky.fe.model.IbeHasLogInfo;
+import com.travelsky.fe.model.IbeInfo;
+import com.travelsky.fe.model.IpServerInfo;
+import com.travelsky.fe.service.AccessServerService;
+import com.travelsky.fe.service.ConfigService;
+import com.travelsky.fe.util.AjaxPushUtil;
+import com.travelsky.fe.util.DateUtil;
+import com.travelsky.fe.util.FEUtil;
+import com.travelsky.fe.util.InfoUtil;
+import com.travelsky.fe.util.SimpleUtil;
+
+@Controller("InfoAction")
+@Namespace("/findinfo")
+@Scope("prototype")
+public class InfoAction extends BaseAction {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private Logger log = Logger.getLogger(this.getClass());
+
+	private InfoVO info;
+
+	/**
+	 * 前台输入信息
+	 */
+	private String appname;
+	private String id;
+	private String logdate;
+	private String hour;
+	
+	private IbeHasLogInfo ibeHasLogInfo = new IbeHasLogInfo();
+
+	@Resource(name = "accessServerService")
+	private AccessServerService accessServerService;
+	
+	@Resource(name = "configService")
+	private ConfigService configService;
+	
+	public InfoVO getInfo() {
+		return info;
+	}
+
+	public void setInfo(InfoVO info) {
+		this.info = info;
+	}
+	
+	/**
+	 * 异常日志查询Action
+	 * @return
+	 * @throws Exception
+	 */
+	@SuppressWarnings({"unchecked"})
+	@Action("find")
+	public String findExceptionAction() throws Exception {
+		
+		InfoUtil.log(false,info.getPageId()," --- 进入findexceptionAction()!", this.getClass());
+		// app Name
+		appname = info.getAppname();
+		id = info.getId();
+		logdate = info.getLogdate();
+		hour = info.getHour();
+		
+		InfoUtil.log(false,info.getPageId(),appname + " - " + id + " - " + logdate, this.getClass());
+		
+		String newlogdate = logdate.replace("-", "");
+		String ibeInfoMsg = null;
+		String hasInfoMsg = null;
+		Map<String, Object> jsonMap = new HashMap<String, Object>();
+		Map<String, Object> ibemsg = null;
+		List<String> exceptionMessage = null;
+		
+		try {
+			
+			Map<String, Object> resultMap = configService.queryIbeAndHasByIp(id);
+			IbeInfo ibeInfo = (IbeInfo)resultMap.get("ibeInfo");
+			List<HasInfo> hasList = (List<HasInfo>) resultMap.get("hasList");
+			String ipId = resultMap.get("ipId").toString();
+			ibemsg = accessServerService.singleThreadAccessIbeServer(	info.getAppname(),
+																		info.getId(),
+																		newlogdate,
+																		-1,
+																		info.getPageId(),
+																		ibeInfo,
+																		hour,
+																		ipId);
+			
+			// 没有找到IBE日志
+			if (ibemsg == null) {
+				InfoUtil.log(false,info.getPageId(),"在IBE中没有找目标日志", this.getClass());
+				throw new MyException("在IBE中没有找目标日志");
+			}
+			
+			exceptionMessage = accessServerService.manyThreadAccessHasServer(	info.getAppname(),
+																				info.getId(), 
+																				appname, 
+																				newlogdate, 
+																				info.getPageId(), 
+																				ibemsg,
+																				hasList,
+																				ipId
+																				);
+			// 没有找到HAS日志
+			if (exceptionMessage == null) {
+				InfoUtil.log(false,info.getPageId(),"在HAS中没有找目标日志", this.getClass());
+				throw new MyException("   在HAS中没有找目标日志   ");
+			}
+				
+			jsonMap.put("dataibe", (List<String>) ibemsg.get("IBEmsg"));
+			jsonMap.put("datahas", exceptionMessage);
+			ibeInfoMsg = SimpleUtil.ListToString((List<String>) ibemsg.get("IBEmsg"));
+			hasInfoMsg = SimpleUtil.ListToString(exceptionMessage);
+			jsonMap.put("success", true);
+			
+			// 查询成功存库
+			if(ibemsg!=null&&exceptionMessage!=null&&!configService.isExistByOnelyid(id)){
+				ibeHasLogInfo.setId(id);
+				ibeHasLogInfo.setIbeInfo(ibeInfoMsg);
+				ibeHasLogInfo.setHasInfo(hasInfoMsg);
+				ibeHasLogInfo.setAppname(appname);
+				ibeHasLogInfo.setOnlyid(id);
+				ibeHasLogInfo.setCreateTime(DateUtil.getSystemTime());
+				ibeHasLogInfo.setLogdate(newlogdate);
+				configService.addIbeHasInfo(ibeHasLogInfo);
+			}
+			
+			InfoUtil.log(false,info.getPageId()," --- findexception结束! --- ", this.getClass());
+			
+		} catch (Exception e) {
+			//jsonMap.put("dataibe", (List<String>) ibemsg.get("IBEmsg")==null?"":(List<String>) ibemsg.get("IBEmsg"));
+			//jsonMap.put("datahas", exceptionMessage==null?"":exceptionMessage);
+			//ibeInfoMsg = SimpleUtil.ListToString((List<String>) ibemsg.get("IBEmsg"));
+			//hasInfoMsg = SimpleUtil.ListToString(exceptionMessage);
+			jsonMap.put("success", false);
+			e.printStackTrace();
+			log.info(e);
+		}
+		// 异常信息显示给前台
+		return jsonOut(jsonMap);
+	}
+	
+	/**
+	 * 前台选择IP Select 标签
+	 * @return
+	 * @throws Exception
+	 */
+	@Action("queryIpServerInfoSelect")
+	public String queryIpServerInfoSelect() throws Exception{
+		Map<String, Object> jsonMap = new HashMap<String, Object>();
+		List<Map<String,Object>> ipSelectList = new ArrayList<Map<String,Object>>();
+		try {
+			List<IpServerInfo> ipServerInfoList = configService.queryAllIpServerInfo();
+			for (IpServerInfo ipServerInfo : ipServerInfoList) {
+				Map<String, Object> ipServerInfoMap = new HashMap<String, Object>();
+				ipServerInfoMap.put("ipServerIp", ipServerInfo.getServerIp());
+				ipServerInfoMap.put("ipServerName", ipServerInfo.getServerName());
+				ipSelectList.add(ipServerInfoMap);
+			}
+			jsonMap.put("success", true);
+			jsonMap.put("ipSelectList", ipSelectList);
+		} catch (Exception e) {
+			jsonMap.put("success", false);
+			e.printStackTrace();
+			log.info(e);
+		}
+		return jsonOut(jsonMap);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Action("found")
+	public String found() throws Exception{
+		Map<String,Object> map = new HashMap<String,Object>();
+		map = (Map<String,Object>)station.get(info.getPageId());
+		AjaxPushUtil.resultPush(info.getPageId(), map.get("ibeInfo").toString(), map.get("hasInfo").toString());
+		return null;
+	}
+	
+	/**
+	 * 从数据库中查询日志信息
+	 * 每次查询先查询数据库，数据库有显示，没有查询FTP找到并存库
+	 * @return
+	 * @throws Exception
+	 */
+	@Action("foundMsg")
+	public String foundMsg() throws Exception{
+		Map<String,Object> jsonMap = new HashMap<String,Object>();
+		IbeHasLogInfo ibeHasLogInfo ;
+		try {
+			if(configService.isExistById(info.getId())){
+				ibeHasLogInfo = configService.queryIbeHasExceptionInfoByOnlyid(info.getId());
+				jsonMap.put("ibeInfo", ibeHasLogInfo.getIbeInfo());
+				jsonMap.put("hasInfo", ibeHasLogInfo.getHasInfo());
+				jsonMap.put("success", true);
+			}else{
+				jsonMap.put("success", false);
+			}
+			} catch (Exception e) {
+				jsonMap.put("success", false);
+				e.printStackTrace();
+				log.info(e);
+		}
+		return jsonOut(jsonMap);
+	}
+	
+	
+	/** TODO
+	 * 查询历史日志Action 搜索 FTP
+	 * @return
+	 * @throws Exception
+	 */
+	@SuppressWarnings({ "unchecked" })
+	@Action("findHistoryAction")
+	public String findHistoryExceptionAction() throws Exception{
+		
+		InfoUtil.log(false,info.getPageId()," --- 进入findHistoryExceptionAction()!", this.getClass());
+		
+		// app Name
+		appname = info.getAppname();
+		id = info.getId();
+		logdate = info.getLogdate();
+		
+		InfoUtil.log(false,info.getPageId(),appname + " - " + id + " - " + logdate, this.getClass());
+		String newlogdate = logdate.replace("-", "");
+		String ibeUrlDate = logdate.replace("-", "/");
+
+		Map<String, Object> jsonMap = new HashMap<String, Object>();
+		Map<String, Object> ibemsg = null;
+		List<String> exceptionMessage = null;
+		
+		String ibeInfoMsg = null;
+		String hasInfoMsg = null;
+		try {
+			
+			Map<String, Object> resultMap = configService.queryIbeAndHasByIp(info.getIpserver());
+			List<IbeInfo> ibeList = (List<IbeInfo>) resultMap.get("ibeList");
+			List<HasInfo> hasList = (List<HasInfo>) resultMap.get("hasList");
+			
+			ibemsg = accessServerService.singleThreadAccessHisIbeServer(appname, 
+																		id, 
+																		ibeUrlDate, 
+																		-1, 
+																		info.getPageId(), 
+																		ibeList);
+			
+			if (ibemsg == null) {
+				InfoUtil.log(false,info.getPageId(),"在IBE中没有找目标日志", this.getClass());
+				throw new MyException("在IBE中没有找目标日志");
+			}
+			
+			// 查询IBE日志
+			exceptionMessage = accessServerService.singleThreadAccessHisHasServer(ibemsg.get("hasname").toString(), 
+																				id, 
+																				appname, 
+																				newlogdate, 
+																				info.getId(), 
+																				ibemsg, 
+																				hasList);
+			
+
+			if (exceptionMessage == null) {
+				InfoUtil.log(false,info.getPageId(),"在HAS中没有找目标日志", this.getClass());
+				throw new MyException("在HAS中没有找目标日志");
+			}
+				
+			jsonMap.put("dataibe", (List<String>) ibemsg.get("IBEmsg"));
+			jsonMap.put("datahas", exceptionMessage);
+			ibeInfoMsg = SimpleUtil.ListToString((List<String>) ibemsg.get("IBEmsg"));
+			hasInfoMsg = SimpleUtil.ListToString(exceptionMessage);
+			jsonMap.put("success", true);
+			
+			// 将查询的数据存入数据库
+			if(ibemsg!=null&&exceptionMessage!=null&&!configService.isExistByOnelyid(id)){
+				ibeHasLogInfo.setId(id);
+				ibeHasLogInfo.setIbeInfo(ibeInfoMsg);
+				ibeHasLogInfo.setHasInfo(hasInfoMsg);
+				ibeHasLogInfo.setAppname(appname);
+				ibeHasLogInfo.setOnlyid(id);
+				ibeHasLogInfo.setCreateTime(DateUtil.getSystemTime());
+				configService.addIbeHasInfo(ibeHasLogInfo);
+			}
+			InfoUtil.log(false,info.getPageId()," --- findHistoryException结束! ---", this.getClass());
+		} catch (Exception e) {
+			jsonMap.put("success", false);
+			e.printStackTrace();
+			log.info(e);
+
+		}
+		// 异常信息显示给前台
+		return jsonOut(jsonMap);
+	}
+	
+	
+	
+	/**
+	 * 异常日志查询Action
+	 * @return
+	 * @throws Exception
+	 */
+	@SuppressWarnings({"unchecked"})
+	@Action("findpi")
+	public String findPiAction() throws Exception {
+		
+		// app Name
+		appname = info.getAppname();
+		id = info.getId();
+		logdate = info.getLogdate();
+		hour = info.getHour();
+		
+		String newlogdate = logdate.replace("-", "");
+		String ibeInfoMsg = null;
+		String hasInfoMsg = null;
+		Map<String, Object> jsonMap = new HashMap<String, Object>();
+		Map<String, Object> ibemsg = null;
+		List<String> exceptionMessage = null;
+		try {
+			
+			Map<String, Object> resultMap = configService.queryIbeAndHasByIp(id);
+			IbeInfo ibeInfo = (IbeInfo)resultMap.get("ibeInfo");
+			List<HasInfo> hasList = (List<HasInfo>) resultMap.get("hasList");
+			String ipId = resultMap.get("ipId").toString();
+			ibemsg = accessServerService.singleThreadAccessIbeServer(	info.getAppname(),
+																		info.getId(),
+																		newlogdate,
+																		-1,
+																		info.getPageId(),
+																		ibeInfo,
+																		hour,
+																		ipId);
+			
+			// 没有找到IBE日志
+			if (ibemsg == null) {
+				InfoUtil.log(false,info.getPageId(),"在IBE中没有找目标日志", this.getClass());
+				throw new MyException("在IBE中没有找目标日志");
+			}
+			
+			exceptionMessage = accessServerService.manyThreadAccessHasServer(	info.getAppname(),
+																				info.getId(), 
+																				appname, 
+																				newlogdate, 
+																				info.getPageId(), 
+																				ibemsg,
+																				hasList,
+																				ipId);
+			
+			// 没有找到HAS日志
+			if (exceptionMessage == null) {
+				InfoUtil.log(false,info.getPageId(),"在HAS中没有找目标日志", this.getClass());
+				throw new MyException("   在HAS中没有找目标日志   ");
+			}
+			List<String> result = new ArrayList<String>();
+			for (String string : exceptionMessage) {
+				if(string.indexOf("FOID")>-1){
+					result.add(string);
+				}
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.info(e);
+
+		}
+		// 异常信息显示给前台
+		return jsonOut(jsonMap);
+	}
+	
+}

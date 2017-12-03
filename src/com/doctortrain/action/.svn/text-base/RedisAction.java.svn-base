@@ -1,0 +1,69 @@
+package com.travelsky.fe.action;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.Namespace;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
+
+import com.travelsky.fe.action.BaseAction;
+import com.travelsky.fe.model.IbeHasLogInfo;
+import com.travelsky.fe.service.ConfigToRedisService;
+
+@Controller
+@Namespace("/redis")
+@Scope("prototype")
+public class RedisAction extends BaseAction{
+	
+	@Resource(name = "configToRedisService")
+	private ConfigToRedisService configToRedisService;
+	
+	private IbeHasLogInfo ibeHasLogInfo = new IbeHasLogInfo();
+	
+	private String id;
+	
+	public IbeHasLogInfo getIbeHasLogInfo() {
+		return ibeHasLogInfo;
+	}
+
+	public void setIbeHasLogInfo(IbeHasLogInfo ibeHasLogInfo) {
+		this.ibeHasLogInfo = ibeHasLogInfo;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	@Action("radd")
+	public String radd() throws Exception{
+		
+		try {
+			configToRedisService.addIbeHasInfo(ibeHasLogInfo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		Map<String,Object> jsonMap = new HashMap<String,Object>();
+		jsonMap.put("success", true);
+		return jsonOut(jsonMap);
+		
+	}
+	
+	@Action("rquery")
+	public String rquery() throws Exception{
+		List<byte[]> ibeHasInfo = configToRedisService.queryIbeHasInfo(id);
+		Map<String,Object> jsonMap = new HashMap<String,Object>();
+		//TODO
+		return jsonOut(jsonMap);
+	}
+	
+	
+}

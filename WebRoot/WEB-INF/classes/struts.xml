@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+	<!--指定字符集编码，解决post请求中文乱码，get这种方式解决不了  -->
+	<constant name="struts.i18n.encoding" value="UTF-8"></constant>
+	<!-- 
+	<constant name="struts.devMode" value="true"></constant>
+	<constant name="struts.i18n.reload" value="true"></constant>
+	<constant name="struts.configuration.xml.reload" value="true"></constant>
+	 -->
+	 <!-- 在生产环境，禁用一些配置项 -->
+	<constant name="struts.devMode" value="false"></constant>
+	<constant name="struts.i18n.reload" value="false"></constant>
+	<constant name="struts.configuration.xml.reload" value="false"></constant>
+	 <!-- 上传最大文件2M -->
+	<constant name="struts.multipart.maxSize" value="104857600"></constant> 
+	<constant name="struts.multipart.saveDir" value="/tmp"/>
+	
+	<package name="base-package" extends="struts-default">
+		<!-- 配置拦截器 -->
+		<interceptors>
+			<interceptor name="anthInterceptor" class="com.doctortrain.web.AuthInterceptor">
+				<param name="excludeMethods">com.doctortrain.action.AnnouncementAction.getAll</param>
+			</interceptor>
+			<!-- 定义拦截器栈 -->
+			<interceptor-stack name="dtStack">
+				<interceptor-ref name="anthInterceptor"/>
+				<interceptor-ref name="defaultStack"/>
+			</interceptor-stack>
+		</interceptors>
+		<!-- 指定默认栈 -->
+		<!-- <default-interceptor-ref name="dtStack"/> -->
+		<!-- 全局结果集的配置，在任何Action中，以及任何拦截器中都能使用这个全局的配置 -->
+		<global-results>
+			<result name="login" type="redirect">/signin.jsp</result>
+			<result name="error">/WEB-INF/jsp/common/error.jsp</result>
+		</global-results>
+	</package>
+	
+	<package name="main-package" extends="base-package">		
+		<action name="*">
+			<result>/WEB-INF/jsp/{1}.jsp</result>
+		</action>
+	</package> 
+
+</struts>

@@ -1,0 +1,598 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>FindException工具</title>
+<style>
+body{ margin:0;background-color:#F0F0F0; position:relative; background-color:#2d3e50;}
+input{ background-color: null; margin:0; padding:0}
+span{ }
+.ibeinfo .span_input{ width:25px;}
+.ibeinfo{ width:800px; }
+.hasinfo .span_input{ width:25px;}
+html,body{ 
+margin:0px; 
+height:100%; 
+} 
+.write{ background-color:#FFF}
+
+
+/*******   a标签      ***********/
+.a_menu_query{color:#FFF; font-family:微软雅黑; font-weight:bold;display:block; text-decoration:none; width:45px;font-size:21px; position:absolute; left:145px; top:150px}
+
+.a_menu_add{ color:#FFF; font-family:微软雅黑; font-weight:bold;display:block; text-decoration:none; width:45px;font-size:21px;position:absolute; left:145px; top:150px; cursor:pointer}
+
+.a_menu_update{ color:#FFF; font-family:微软雅黑; font-weight:bold;display:block; text-decoration:none; width:45px;font-size:21px;position:absolute; left:145px; top:200px;cursor:pointer}
+
+.a_menu_delete{ color:#FFF; font-family:微软雅黑; font-weight:bold;display:block; text-decoration:none; width:45px;font-size:21px;position:absolute; left:145px; top:250px}
+
+.a_menu_search{ color:#FFF; font-family:微软雅黑; display:block; text-decoration:none; width:74px;font-size:18px;position:absolute; left:130px; top:400px}
+
+.a_menu_localsearch{ color:#FFF; font-family:微软雅黑;display:block; text-decoration:none; width:110px;font-size:18px;position:absolute; left:110px; top:450px}
+
+
+.a_menu_div{ width:100px; height:300px; padding-left:221px; float:left}
+
+.a_menu_query:hover{ border-bottom:1px solid #FFF}
+.a_menu_add:hover{ border-bottom:1px solid #FFF}
+.a_menu_update:hover{ border-bottom:1px solid #FFF}
+.a_menu_delete:hover{ border-bottom:1px solid #FFF}
+.a_menu_search:hover{ border-bottom:1px solid #FFF}
+.a_menu_localsearch:hover{ border-bottom:1px solid #FFF}
+
+.a_right{ margin-top:50px; border-bottom:3px solid #2d3e50; width:800px}
+
+
+.a_localsearch{font-family:微软雅黑; font-weight:bold; display:block; float:right; margin-left:20px; text-decoration:none; color:#2d3e50; margin-top:2px}
+.a_index{font-family:微软雅黑; font-weight:bold; display:block; float:right; margin-left:20px; text-decoration:none; color:#2d3e50; margin-top:2px}
+
+.a_localsearch:hover{border-bottom:1px solid #2d3e50}
+.a_index:hover{border-bottom:1px solid #2d3e50}
+
+.a_queryip{ font-family:微软雅黑; font-weight:bold;display:block; float:left; margin-left:12px;text-decoration:none;color:#2d3e50; margin-top:2px}
+.a_queryip:hover{border-bottom:1px solid #2d3e50}
+
+.sadd{ display:block; float:right; width:40px; height:22px}
+.scommit{ display:block; float:right; width:40px; height:22px; margin-right:5px}
+/**********        左右模块   ******************/
+
+.bigleft{ float:left; width:320px; position:fixed;}
+.bigright{ float:left; width:980px;  margin-left:320px;position:absolute; background-color:#F0F0F0; padding-left:70px; height:auto}
+
+/*** 左侧主标题     ******************/
+.maintitle{ float:left; font-family:微软雅黑; font-size:26px; color:#ededef; margin-left:90px; margin-top:50px; font-weight:bold; margin-bottom:20px}
+
+/*******    input标签     ***************/
+.a_right input{ margin-left:10px;}
+.a_right{ height:30px; margin-bottom:18px; width:800px}
+
+/********** 右侧服务器信息  **********/
+.biginfo{ overflow:auto}
+.infotitle{font-family:微软雅黑; font-weight:bold;color:#2d3e50; text-align:center; width:800px}
+.ibeinfotitle{font-family:微软雅黑; font-weight:bold;color:#2d3e50; width:800px; padding-bottom:2px}
+.hasinfotitle{font-family:微软雅黑; font-weight:bold;color:#2d3e50; width:800px; padding-bottom:2px; margin-top:10px}
+
+/*** IBE表格 ***/
+table.ibetable {
+	font-family: verdana,arial,sans-serif;
+	font-size:11px;
+	color:#333333;
+	border-width: 1px;
+	border-color: #666666;
+	border-collapse: collapse;
+	width:800px;
+	margin-bottom:18px;
+	margin-top:10px
+}
+table.ibetable th {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #dedede;
+	width:auto
+}
+table.ibetable td {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #ffffff;
+	text-align:center;
+	width:auto
+}
+/* input  */
+.input_query_text{ width:126px; height:16px; padding:3px 3px; color:#666}
+.input_query_text_click{ width:126px; height:16px; padding:3px 3px; color:#222}
+.input_query_button{ width:38px; height:24px}
+.deletetr{ background-image:url(imgs/config/deletetr.jpg); background-position:center; background-repeat:no-repeat;width:15px; height:15px; cursor:pointer;}
+.deleteall{ background-image:url(imgs/config/deltou.png); background-position:center; background-repeat:no-repeat;width:15px; height:15px; cursor:pointer;float:right; margin-right: 2px}
+.editIpServer{background-image:url(imgs/config/015.gif); background-position:center; background-repeat:no-repeat;width:15px; height:15px; cursor:pointer;float:right; margin-right: 6px}
+
+.page{ width:800px;text-align:center; margin-bottom:300px}
+.pagebar{ cursor:pointer;}
+.msg{ color: red; font-size: 14px; font-family:微软雅黑}
+.pagebar{ font-family:微软雅黑; font-size:14px; color:#2d3e50}
+
+.pageunwork{ font-family:微软雅黑; font-size:14px; color:#888}
+.currentpage{ font-family:微软雅黑; font-size:14px; color:#2d3e50; text-decoration:underline;}
+
+</style>
+<script type="text/javascript" src="jquery/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="jquery/form/jquery.form.js"></script>
+<script type="text/javascript">
+
+	function path(){
+		return location.href.substring(0,parseInt(location.href.lastIndexOf("/"))+1);
+	}
+
+     // 搜索输入框，失去焦点事件
+	function inputonblur(){
+		if($("#input_query_text").val()==""){
+			$("#input_query_text").val("请输入IP地址或名称");
+		}
+		$("#input_query_text").removeClass("input_query_text_click");	
+		$("#input_query_text").addClass("input_query_text");
+		}
+	
+	// 全选 全不选 
+	 function check_all(obj,cName) {  
+ 		 var checkboxs = document.getElementsByName(cName);  
+ 		 for ( var i = 0; i < checkboxs.length; i+=1) {  
+   				 checkboxs[i].checked = obj.checked;  
+			  }  
+      	}  
+	
+    // 搜索框 点击消失内容事件	
+	function clickinput(){
+			if($("#input_query_text").val()=="请输入IP地址或名称"){
+				$("#input_query_text").removeClass("input_query_text");
+				$("#input_query_text").addClass("input_query_text_click");
+				$("#input_query_text").val("");
+			}
+	}
+	
+	// 添加 计数器
+	var num = 1;
+	// 删除id容器
+	var n1;
+	var theip;
+	var ibeOrHas;
+	// 添加事件
+	function addclick(a,n){    
+		num++;
+		ibeOrHas = a ;
+		var idinfo =a+"_"+n+"_"+num;// ibe_1_1
+		var aNum=a+num;
+		var idinfo1 = "\""+idinfo+"\"";
+		var a1 = "\""+a+"\"";
+		var info =a+'table' ;
+		if(a=="ibeInfo"){
+			$("#"+info+"").append("<tr id='"+idinfo+"'><td><div class='deletetr' onclick='deletetr("+idinfo1+","+a1+")' ></div><input id='hideid' type='hidden' name='infosVO."+aNum+".serverIp' value='"+theip+"'/></td><td><input id='"+aNum+"_ip' name='infosVO."+aNum+".ip' type='text'/></td><td><input id='"+aNum+"_username' name='infosVO."+aNum+".username' type='text'/></td><td><input id='"+aNum+"_password' name='infosVO."+aNum+".password' type='text'/></td><td><input id='"+aNum+"_path' name='infosVO."+aNum+".path' type='text'/></td></tr>")
+		}else if(a=="hasInfo"){
+			$("#"+info+"").append("<tr id='"+idinfo+"'><td><div class='deletetr' onclick='deletetr("+idinfo1+","+a1+")' ></div><input id='hideid' type='hidden' name='infosVO."+aNum+".serverIp' value='"+theip+"'/></td><td><input id='"+aNum+"_ip' name='infosVO."+aNum+".ip' type='text'/></td><td><input id='"+aNum+"_username' name='infosVO."+aNum+".username' type='text'/></td><td><input id='"+aNum+"_password' name='infosVO."+aNum+".password' type='text'/></td><td><input id='"+aNum+"_path' name='infosVO."+aNum+".path' type='text'/></td><td><input id='"+aNum+"_sih_path' name='infosVO."+aNum+".sihPath' type='text'/></td></tr>")
+		}
+		 if(num==2){
+			$("#"+a+"title").append("<input class='scommit' id='scommit' type='submit' value='保存' />")
+			if(a=="ibeInfo"){
+				$("#saddhas").attr("disabled", true);
+			}else{
+				$("#saddibe").attr("disabled", true);
+			}
+			n1 = n;
+		}
+		if(num==10){
+			$("#saddibe").attr("disabled", true); 
+			$("#saddhas").attr("disabled", true); 
+		}
+	}
+	
+	//删除添加input事件
+	function deletetr(id,a){
+		num--;
+
+		$("#"+id+"").remove();
+		if(num==1){
+			$("#scommit").remove();
+			$("#saddibe").attr("disabled", false);
+			$("#saddhas").attr("disabled", false);
+		}
+		if(num<10&&a=="ibeInfo"){
+			$("#saddibe").attr("disabled", false); 
+		}else{
+			$("#saddhas").attr("disabled", false); 
+		}
+	}
+	
+	$(function(){
+				// 获取根地址
+				// location.href.substring(0,parseInt(location.href.lastIndexOf("/"))+1)
+		
+		   var str=location.href; //取得整个地址栏
+		   var num=str.indexOf("?")
+		   str=str.substr(num+1);
+		   if(num!=-1){
+				query(Number(str));
+		   }else{
+				query(1);
+		   }
+	})
+		var	pageNo;
+		var searchIp="";
+		var searchName="";
+		
+	function search(){
+		var searchWord = $.trim($("#input_query_text").val());
+		if(searchWord.indexOf(".")>0){
+			searchIp=$.trim($("#input_query_text").val());
+		}
+		if(searchWord.indexOf(".")<0){
+			if($("#input_query_text").val()=="请输入IP地址或名称"){
+				searchName="";
+			}else{
+				searchName = $.trim($("#input_query_text").val());
+			}
+		}
+	
+		
+		$.ajax({
+			url:"config/queryOne.action",
+			type:"post",
+			contentType:"application/x-www-form-urlencoded; charset=utf-8", 
+			data:{
+				"infoVO.searchIp":searchIp,
+				"infoVO.searchName":searchName,
+			},
+			beforeSend:function(){
+				$("#msg").html("正在查询请稍后...");
+				return true;
+			}, 
+			success:function(jsonObject){
+				if(jsonObject.success){
+					query(jsonObject.pageNo+1);
+					$("#msg").html("查询成功!");
+				}else{
+					$("#msg").html("查询失败!");
+				}
+				
+			}
+		})
+		
+	}
+		
+	function query(no){
+		pageNo = no;
+		$.ajax({
+			url:"config/queryall.action",
+			type:"post",
+			contentType:"application/x-www-form-urlencoded; charset=utf-8", 
+			data:{
+				"infoVO.pageNo":pageNo,
+			},
+			beforeSend:function(){
+				$("#msg").html("正在查询请稍后...");
+				return true;
+			}, 
+			success:function(jsonObject){
+				if(jsonObject.success){
+					$("#msg").html("查询成功！");
+					searchName=""
+					searchIp="";
+				}else{
+					$("#msg").html("没有找到服务器信息！");
+					searchName=""
+				    searchIp="";
+				} 
+				var ibeInfoString = "";
+				var hasInfoString = "";
+				var a = "ibecheck1"; 
+				var a1 = "\""+a+"\"";
+				var b = "hascheck1"; 
+				var b1 = "\""+b+"\"";
+				ibeInfoString+="<tr>";
+				ibeInfoString+="<th width='43'>";
+				ibeInfoString+="<input onclick='check_all(this,"+a1+")' type='checkbox' />";
+				ibeInfoString+="</th>";
+				ibeInfoString+="<th width='201'>IBE - IP</th>";
+				ibeInfoString+="<th width='194'>IBE - 用户名</th>";
+				ibeInfoString+="<th width='168'>IBE - 密码</th>";
+				ibeInfoString+="<th width='170'>IBE - 路径</th>";
+				ibeInfoString+="'</tr>'";
+				$.each(jsonObject.ibeDataList,function(i,n){
+					ibeInfoString+="<tr>";
+					ibeInfoString+="<td>";
+					ibeInfoString+="<input id='checkInfo' name='ibecheck1' type='checkbox' value="+n.ibeid+" />";
+					ibeInfoString+="</td>";
+					ibeInfoString+="<td>"+n.ibeip+"</td>";
+					ibeInfoString+="<td>"+n.ibeusername+"</td>";
+					ibeInfoString+="<td>"+n.ibepassword+"</td>";
+					ibeInfoString+="<td>"+n.ibepath+"</td>";
+					ibeInfoString+="</tr>";
+				});
+					hasInfoString+="<tr>";
+					hasInfoString+="<th width='43'>";
+					hasInfoString+="<input onclick='check_all(this,"+b1+")' type='checkbox' />";
+					hasInfoString+="</th>";
+					hasInfoString+="<th width='201'>HAS - IP</th>";
+					hasInfoString+="<th width='194'>HAS - 用户名</th>";
+					hasInfoString+="<th width='168'>HAS - 密码</th>";
+					hasInfoString+="<th width='170'>HAS - 主机日志路径</th>";
+					hasInfoString+="<th width='170'>HAS - SIH日志路径</th>";
+					hasInfoString+="</tr>";
+				$.each(jsonObject.hasDataList,function(i,n){
+					hasInfoString+="<tr>";
+					hasInfoString+="<td>";
+					hasInfoString+="<input id='checkInfo' name='hascheck1' type='checkbox' value="+n.hasid+" />";
+					hasInfoString+="</td>";
+					hasInfoString+="<td>"+n.hasip+"</td>";
+					hasInfoString+="<td>"+n.hasusername+"</td>";
+					hasInfoString+="<td>"+n.haspassword+"</td>";
+					hasInfoString+="<td>"+n.haspath+"</td>";
+					hasInfoString+="<td>"+n.sihhaspath+"</td>";
+					hasInfoString+="</tr>";
+				});
+				
+				$("#ibeInfotable").html("");
+				$("#ibeInfotable").append(ibeInfoString);
+				$("#hasInfotable").html("");
+				$("#hasInfotable").append(hasInfoString);
+				$("#ipServerIp").html(jsonObject.serverip);
+				$("#ipServerName").html(jsonObject.servername);
+				$("#ipServerId").val(jsonObject.ipServerId);
+				theip=jsonObject.serverip
+				var pageHtmlString = "";
+				if(jsonObject.total>1){
+					var before = pageNo - 1;
+					var next = pageNo + 1;
+					pageHtmlString+="<a  class='pagebar'>共 <span>"+jsonObject.total+"</span> 页</a><br/><br/>";
+					if(pageNo==1){
+						pageHtmlString+="<a class='pageunwork' >首页</a>&nbsp";
+						pageHtmlString+="<a class='pageunwork' >上一页</a>&nbsp&nbsp&nbsp";
+					}else{
+						pageHtmlString+="<a class='pagebar' onclick='query(1)'>首页</a>&nbsp";
+						pageHtmlString+="<a class='pagebar' onclick='query("+before+")'>上一页</a>&nbsp&nbsp&nbsp";
+					}
+					for(var j=1;j<=jsonObject.total;j++){
+						if(pageNo==j){
+							pageHtmlString+="<a class='currentpage'>"+j+"</a>&nbsp";
+						}else{
+							pageHtmlString+="<a class='pagebar' onclick='query("+j+")'>"+j+"</a>&nbsp";
+						}
+					}
+					if(pageNo==jsonObject.total){
+						pageHtmlString+="&nbsp&nbsp<a class='pageunwork'>下一页</a>&nbsp";
+						pageHtmlString+="<a class='pageunwork'>尾页</a>";
+					}else{
+						pageHtmlString+="&nbsp&nbsp<a class='pagebar' onclick='query("+next+")'>下一页</a>&nbsp";
+						pageHtmlString+="<a class='pagebar' onclick='query("+jsonObject.total+")'>尾页</a>";
+					}
+				$("#page").html(pageHtmlString);
+				}
+			}
+		});
+	}
+	
+	$("#infoform").ajaxForm({
+		 contentType:"application/x-www-form-urlencoded; charset=utf-8", 
+		 beforeSubmit:function(){
+			 for(var i=2;i<=num;i++){
+				 if($('#'+ibeOrHas+i+'_ip').val()==""){
+					 alert("ip不能为空！");
+					 return false;
+				 }
+				 if($('#'+ibeOrHas+i+'_username').val()==""){
+					 alert("用户名不能为空！");
+					 return false;
+				 }
+				 if($('#'+ibeOrHas+i+'_password').val()==""){
+					 alert("密码不能为空！");
+					 return false;
+				 }
+				 if($('#'+ibeOrHas+i+'_path').val()==""){
+					 alert("路径不能为空！");
+					 return false;
+				 }
+			 }
+			 
+			$("#msg").html("正在保存请稍后...")
+			return true;
+		}, 
+		success:function(jsonObject){
+			if(jsonObject.success){
+				$("#msg").html("保存成功！")
+				window.location.href=path()+"config.jsp?"+pageNo;
+			}else{
+				$("#msg").html("保存失败！")
+			}
+		}
+	})
+	
+	/*
+	* 删除
+	*/
+	function delInfo(){
+		var ids;
+		var i=0;
+		
+		if($(":checkbox[name='ibecheck1']:checked").length==0&&$(":checkbox[name='hascheck1']:checked").length==0){
+			alert("请选择一个或多个删除目标!");
+			return;
+		}
+		
+		if($(":checkbox[name='ibecheck1']:checked").attr("name")=="ibecheck1"){
+			var ibeOrHas = "ibe";
+			ids = new Array($(":checkbox[name='ibecheck1']:checked").length);
+			$(":checkbox[name='ibecheck1']:checked").each(function(){
+				var id = $(this).val();	
+				ids[i++] = id;
+			}); 
+		}else if($(":checkbox[name='hascheck1']:checked").attr("name")=="hascheck1"){
+			var ibeOrHas = "has"; 
+			ids = new Array($(":checkbox[name='hascheck1']:checked").length);
+			$(":checkbox[name='hascheck1']:checked").each(function(){
+				var id = $(this).val();	
+				ids[i++] = id;
+			}); 
+		}
+			if(confirm("您确定要删除吗？")){
+				delajax(ids,ibeOrHas)
+			}
+		}
+	
+	
+	function delAll(){
+		
+		var ibeids= new Array();
+		var i=0;
+		var hasids= new Array();
+		var j=0;
+		var name = $("#ipServerName").html();
+		if(confirm("确定删除“"+name+"”服务器吗？")){
+			$(":checkbox[name='ibecheck1']").each(function(){
+				var id = $(this).val();
+				ibeids[i++] = id;
+			});
+				delajax(ibeids,"ibe")
+			$(":checkbox[name='hascheck1']").each(function(){
+				var id = $(this).val();	
+				hasids[j++] = id;
+			});
+				delajax(hasids,"has")
+				delajax($("#ipServerId").val(),"ipServer")
+		}
+	}
+	
+	function delajax(ids,ibeOrHas){
+		$.ajax({
+			url:"config/delInfo.action",
+			type:"post",
+			contentType:"application/x-www-form-urlencoded; charset=utf-8", 
+			data:{
+				"infosVO.ids":"{"+ids+"}",
+				"infosVO.ibeOrHasOrIpServer":ibeOrHas+"Info"
+			},
+			beforeSend:function(){
+				$("#msg").html("正在删除请稍后...");
+				sleep(500);
+				return true;
+			},
+			success:function(jsonObject){
+				if(jsonObject.success){
+					$("#msg").html("删除成功!");
+					window.location.href=path()+"config.jsp";
+				}else{
+					$("#msg").html("删除失败!");
+				}
+			} 
+		}) 
+	}
+	
+	
+	// 添加Server操作
+	function add(){
+		window.open("add.jsp","newwindow","height=600,width=800,top=50,left=200,resizable=no,status=no,toolbar=no,menubar=no,location=no,scrollbars=yes"); 
+	}
+	
+	
+	// 更新操作
+	function update(){
+		if($(":checkbox:checked").length==0){
+			alert("请选择一条信息!")
+			return;
+		}
+		if($(":checkbox:checked").length>1){
+			alert("只能选择一个!")
+			return;
+		}
+		var id = $(":checkbox:checked").val();
+		var type;
+		if("ibecheck1"==$(":checkbox:checked").attr('name')){
+			type = "ibe";
+			window.open("config/toUpdateIbe.action?id="+id,"newwindow","height=500,width=800,top=50,left=200,resizable=no,status=no,toolbar=no,menubar=no,location=no,scrollbars=yes"); 
+		}
+		if("hascheck1"==$(":checkbox:checked").attr('name')){
+			type = "has"
+			window.open("config/toUpdateHas.action?id="+id,"newwindow","height=500,width=800,top=50,left=200,resizable=no,status=no,toolbar=no,menubar=no,location=no,scrollbars=yes"); 
+		}
+	}
+	
+	// 编辑ipServer
+	function editIpServer(){
+		var a = $("#ipServerId").val();
+		window.open("config/toEdit.action?ipserverid="+a,"newwindow","height=342,width=800,top=60,left=220,resizable=no,status=no,toolbar=no,menubar=no,location=no,scrollbars=yes"); 
+	}
+	
+	// 延迟时间
+	function sleep(mberMillis) { 
+		   var now = new Date();
+		   var exitTime = now.getTime() + mberMillis;  
+		   while (true) { 
+		       now = new Date(); 
+		       if (now.getTime() > exitTime)    return true;
+		    }
+		}
+
+</script>
+</head>
+
+<body>
+<a onclick=""></a>
+    	 <!--  左边  -->
+    	
+    	<div class="bigleft">
+        	<div class="maintitle">后台信息配置</div>
+            <div class="a_menu_div">
+           	    <a class="a_menu_add"  onclick="add()">新增</a>
+                <a class="a_menu_update" onclick="update()">修改</a>
+       	    <a class="a_menu_delete" onclick="delInfo()" href="">删除</a></div>
+        </div>
+        
+        <!--  右边  -->
+        
+<div class="bigright">
+          	
+            <div class="a_right">
+            	<a class="a_localsearch" href="search.html">本地查询</a>
+                <a class="a_index" href="index.jsp">异常查询</a>
+                  <input onclick="clickinput()" id="input_query_text" class="input_query_text" type="text" onblur="inputonblur()" value="请输入IP地址或名称"/><input class="input_query_button" onclick="search()" type="button"  value="查询"/>
+              
+            </div>
+            
+            <!------- info -------->
+            <form id="infoform" action="config/addibehasinfo.action" method="post">
+            <div class="biginfo">
+            <div id="msg" class="msg"></div>
+            	<div class="infotitle">
+            		<input id="ipServerId" type="hidden"/>
+                	<span id="ipServerIp">ipserver</span>
+                    <span> --- </span>
+                    <span id="ipServerName">info</span>
+                    <div class="deleteall" onclick="delAll()"></div>
+                    <div class="editIpServer" onclick="editIpServer()"></div>
+                </div>
+                <div class="ibeinfotitle" id="ibeInfotitle">
+                	IBE服务器信息
+                <input id="saddibe" class="sadd" type="button" value="添加" onclick="addclick('ibeInfo',1)" />
+                </div>
+                <div class="ibeinfo" id="ibeinfo">
+                	<table class="ibetable" id="ibeInfotable">
+                    	
+                    </table>
+                </div>
+                <div class="hasinfotitle" id="hasInfotitle">HAS服务器信息
+                <input id="saddhas" class="sadd" type="button" value="添加" onclick="addclick('hasInfo',1)" />
+                </div> 
+                <div class="hasinfo">
+                	<table class="ibetable" id="hasInfotable">
+                    	
+                    </table>
+                </div>
+                <div class="page" id="page">           </div>
+            </div>
+            <!------- info -------->
+            </form>
+          </div>
+
+</body>
+</html>

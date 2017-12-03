@@ -1,0 +1,67 @@
+package com.travelsky.fe.action;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
+import org.apache.struts2.interceptor.ServletRequestAware;
+import org.apache.struts2.interceptor.ServletResponseAware;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.opensymphony.xwork2.ActionSupport;
+import com.travelsky.fe.util.AjaxPushUtil;
+
+public class BaseAction extends ActionSupport implements ServletRequestAware,ServletResponseAware{
+	
+	protected HttpServletRequest request;
+	protected HttpServletResponse response;
+	protected static Map<String,Object> station = new HashMap<String,Object>();
+	
+	private Logger log = Logger.getLogger(this.getClass());
+	
+	// jackson插件解析json数据 传 个页面
+	public String jsonOut(Object jsonObject) throws Exception{
+		ObjectMapper objectMapper = new ObjectMapper();
+		String jsonString = objectMapper.writeValueAsString(jsonObject);
+		response.setContentType("text/json;charset=UTF-8");
+		response.getWriter().print(jsonString);
+		return null;
+	}
+	
+	/**
+	 * ajax显示页面
+	 * 并
+	 * 将信息放入静态Map
+	 * 以防服务器连接超时
+	 * @param jsonObject
+	 * @param ibeInfo
+	 * @param hasInfo
+	 * @param pageId
+	 * @return
+	 * @throws Exception
+	 */
+	public String jsonOutForFound(Object jsonObject,String ibeInfo,String hasInfo,String pageId) throws Exception{
+		Map<String,Object> map = new HashMap<String,Object>();
+		map.put("ibeInfo", ibeInfo);
+		map.put("hasInfo", hasInfo);
+		station.put(pageId, map);
+		ObjectMapper objectMapper = new ObjectMapper();
+		String jsonString = objectMapper.writeValueAsString(jsonObject);
+		response.setContentType("text/json;charset=UTF-8");
+		response.getWriter().print(jsonString);
+		
+		return null;
+	}
+	
+	
+	public void setServletResponse(HttpServletResponse response) {
+		this.response = response;
+	}
+
+	public void setServletRequest(HttpServletRequest request) {
+		this.request = request;
+	}
+}

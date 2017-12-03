@@ -1,0 +1,401 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+   <base href="${pageContext.request.scheme}://${pageContext.request.serverName}:${pageContext.request.serverPort}${pageContext.request.contextPath}/">
+   <!--解决abslute标签消失的问题-->
+   <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7"/>
+   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+   <title>异常日志查询引擎  Find Exception Log Engine</title>
+<!-- 日期css -->    
+<link href="css/jsp/index.css" rel="stylesheet" type="text/css"/>
+<link href="css/datepicker/jquery-ui-1.8.18.custom.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="jquery/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="jquery/form/jquery.form.js"></script>
+<script type="text/javascript" src="dwr/engine.js"></script>
+<script type="text/javascript" src="jquery/datepicker/jquery-ui-1.8.18.custom.min.js"></script>
+<script type="text/javascript" src="jquery/datepicker/jquery.ui.datepicker-zh-CN.js"></script>
+<script type="text/javascript" src="js/chargebrowser.js" ></script>
+<script type="text/javascript">
+
+var pageId ="";
+var nowTime="";
+
+	function randomString() {
+			len =32;
+			var $chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';    /**** 默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1 ****/
+			var maxPos = $chars.length;
+			var pwd = '';
+		for (i = 0; i < len; i++) {
+			pwd += $chars.charAt(Math.floor(Math.random() * maxPos));
+		}
+			return pwd;
+	}
+
+$(function(){
+	
+	$("#logTime").datepicker( 'setDate' , new Date());
+	$("#logTime").datepicker({
+		changeMonth: true,
+		changeYear: true,
+		//showButtonPanel: true,
+		dateFormat: 'yy-mm-dd'
+	});
+	//yyyy-mm-dd 格式
+	var date = new Date();
+	var str = "";
+	var strr = ""
+	date.getMonth()<=9?str="-0":str="-";
+	date.getDate()<=9?strr="-0":strr="-";
+	nowTime=date.getFullYear()+str+(date.getMonth()+1)+strr+date.getDate();
+	$("#logTime").val(nowTime);
+	pageId = randomString();
+	$("#pageId").val(pageId)
+	
+	checkDate();
+	
+});
+	// 启动dwr引擎
+	dwr.engine.setActiveReverseAjax(true);
+	dwr.engine.setNotifyServerOnPageUnload(true);
+	
+	function showSysMsg(Id,info){
+		if(pageId==Id){
+			$('#sysinfo').prepend(""+info+"<br>");
+		}
+	}
+	
+	// ajax访问请求超时，进行的操作
+	function resultPush(id,ibeInfo,hasInfo){
+		alert(id);	
+		alert(pageId);
+		if(pageId==id){
+			$("#msg").text("查询成功!!!");
+			$("#ibemsg").text(ibeInfo);
+			$("#hasmsg").text(hasInfo);
+			$("#cleanid").removeAttr("disabled");
+			$("#cleanid").removeClass("submitButtonStart");
+		}
+	}
+	
+	  
+	//给表单绑定ajaxForm方法
+	/*$("#userForm").ajaxForm({
+		 contentType:"application/x-www-form-urlencoded; charset=utf-8", 
+		 beforeSubmit:function(){
+			$("#cleanid").click(function(){
+				$("#ibemsg").html("");
+				$("#hasmsg").html("");
+				$("#sysinfo").html("");
+			})
+			$("#msg").text("正在查询请稍后...");
+			$("#cleanid").attr("disabled","disabled");
+			$("#cleanid").addClass("submitButtonStart");
+			return true;
+		},
+		error:function(){
+			queryFromDatabase();
+		},
+		success:function(jsonObject){
+			if(jsonObject.success){
+				$("#msg").text("查询成功!");
+				$("#cleanid").removeAttr("disabled");
+				$("#cleanid").removeClass("submitButtonStart")
+			}else{
+				$("#msg").text("查询失败!正在为您查询历史日志...");
+				// ajax action 去 查询历史库
+				queryHis();
+			} 
+			var hasStr ="";
+			var ibeStr ="";
+			$.each(jsonObject.datahas,function(i,n){
+				hasStr+=n+"\n";
+				//$("#hasmsg").append(n+"\n");
+			});
+			$("#hasmsg").text(hasStr);
+			$.each(jsonObject.dataibe,function(i,n){
+				ibeStr+=n+"\n";
+			});
+			$("#ibemsg").text(ibeStr);
+		}
+	}); */
+	
+	/*
+	* 从数据库查询异常信息 
+	*/
+	function queryFromDatabase(){
+		
+		//校验
+		if(!check()){
+			return;
+		}
+		
+		$.ajax({
+			url:"findinfo/foundMsg.action",
+			type:"post",
+			contentType:"application/x-www-form-urlencoded; charset=utf-8",
+			data:{
+				"info.id":$("#onlyid").val()
+			},
+			beforeSend:function(){
+				$("#ibemsg").html("");
+				$("#hasmsg").html("");
+				$("#sysinfo").html("");
+				$("#msg").text("正在查询请稍后...");
+				return true;
+			}, 
+			success:function(jsonObject){
+				if(jsonObject.success){
+					$("#msg").text("查询成功!!");
+					$("#cleanid").removeAttr("disabled");
+					$("#cleanid").removeClass("submitButtonStart")
+				}else{
+					//$("#msg").text("查询超时重新查询");							
+					//$("#cleanid").removeAttr("disabled");
+					//$("#cleanid").removeClass("submitButtonStart")
+					//sel();
+					queryHis();
+				} 
+				$("#hasmsg").text(jsonObject.hasInfo);
+				$("#ibemsg").text(jsonObject.ibeInfo);
+			}
+		});
+	}
+	
+	/**
+	*	查询历史日志信息
+	*/
+	function queryHis(){
+		$.ajax({
+			url:"findinfo/findHistoryAction.action",
+			type:"post",
+			contentType:"application/x-www-form-urlencoded; charset=utf-8",
+			data:{
+				"info.pageId":$("#pageId").val(),
+				"info.logdate":$("#logTime").val(),
+				"info.appname":$("#appname").val(),
+				"info.id":$("#onlyid").val()
+			},
+			beforeSend:function(){
+				$("#cleanid").click(function(){
+					$("#ibemsg").html("");
+					$("#hasmsg").html("");
+					$("#sysinfo").html("");
+				})
+				$("#msg").text("正在查询历史日志请稍后...");
+				$("#cleanid").attr("disabled","disabled");
+				$("#cleanid").addClass("submitButtonStart")
+				return true;
+			},
+			error:function(){
+				$("#msg").text("查询超时!等待系统信息显示完毕后..重新查询");
+				$("#cleanid").removeAttr("disabled");
+				$("#cleanid").removeClass("submitButtonStart")
+				
+			},
+			 /* error: function(XMLHttpRequest, textStatus, errorThrown) {
+				 alert(XMLHttpRequest.status);
+				 alert(XMLHttpRequest.readyState);
+				 alert(textStatus);
+				   }, */
+			success:function(jsonObject){
+				if(jsonObject.success){
+					$("#msg").text("查询成功!");
+					$("#cleanid").removeAttr("disabled");
+					$("#cleanid").removeClass("submitButtonStart")
+				}else{
+					sel();
+					//$("#msg").text("查询日志失败，请重新查询!");							
+					//$("#cleanid").removeAttr("disabled");
+					//$("#cleanid").removeClass("submitButtonStart")
+				} 
+				var hasStr ="";
+				var ibeStr ="";
+				$.each(jsonObject.datahas,function(i,n){
+					hasStr+=n+"\n";
+					//$("#hasmsg").append(n+"\n");
+				});
+				$("#hasmsg").text(hasStr);
+				$.each(jsonObject.dataibe,function(i,n){
+					ibeStr+=n+"\n";
+				});
+				$("#ibemsg").text(ibeStr);
+				
+			}
+		});
+	}
+	
+	 
+	
+	 function sel(){ 
+		$.ajax({
+			url:"findinfo/find.action",
+			type:"post",
+			contentType:"application/x-www-form-urlencoded; charset=utf-8",
+			data:{
+				"info.pageId":$("#pageId").val(),
+				"info.logdate":$("#logTime").val(),
+				"info.appname":$("#appname").val(),
+				"info.id":$("#onlyid").val(),
+				"info.hour":$("#hour").val()
+			},
+			beforeSend:function(){
+				$("#cleanid").click(function(){
+					$("#ibemsg").html("");
+					$("#hasmsg").html("");
+					$("#sysinfo").html("");
+				})
+				$("#msg").text("正在查询请稍后...");
+				$("#cleanid").attr("disabled","disabled");
+				$("#cleanid").addClass("submitButtonStart")
+				return true;
+			},
+			error:function(){
+				$("#msg").text("查询超时!等待系统信息显示完毕后..重新查询");
+				$("#cleanid").removeAttr("disabled");
+				$("#cleanid").removeClass("submitButtonStart")
+			},
+			success:function(jsonObject){
+				if(jsonObject.success){
+					$("#msg").text("查询成功!");
+					$("#cleanid").removeAttr("disabled");
+					$("#cleanid").removeClass("submitButtonStart");
+				}else{
+					// 查询失败去 查询历史
+					$("#msg").text("查询日志失败，请重新查询!");							
+					$("#cleanid").removeAttr("disabled");
+					$("#cleanid").removeClass("submitButtonStart")
+					//queryHis();
+				} 
+				var hasStr ="";
+				var ibeStr ="";
+				$.each(jsonObject.datahas,function(i,n){
+					hasStr+=n+"\n";
+					//$("#hasmsg").append(n+"\n");
+				});
+				$("#hasmsg").text(hasStr);
+				$.each(jsonObject.dataibe,function(i,n){
+					ibeStr+=n+"\n";
+				});
+				$("#ibemsg").text(ibeStr);
+				
+			}
+		});
+	} 
+	 
+	 //TODO 校验
+	function check(){
+		
+		var year =""; //2016-04-07
+		var month ="";
+		var day ="";
+		year = nowTime.substring(0,4)-1;
+		month = nowTime.substring(5,7);
+		day = nowTime.substring(8,10);
+		var pastTime = year+"-"+month+"-"+day
+		//alert(pastTime)
+		
+		// 时间范围校验
+		if(pastTime>$("#logTime").val()){
+			alert("日期太久超过一年期限，请重新调整日期!");
+			return false;
+		}
+		// 非空校验
+		if($("#appname").val()==""){
+			alert("appname不能为空！")
+			return false;
+		}
+		// 非空校验
+		if($("#onlyid").val()==""){
+			alert("IDcode不能为空！")
+			return false;
+		}
+		
+		
+		return true;
+	}	
+
+
+</script>
+</head>
+<body> 
+ <form action="findinfo/find.action" method="post" id="userForm">
+ 	<input id="pageId" type="hidden" name="info.pageId">
+	<div class="tbody">
+    	<div class="bigleft">
+    	  <div class="maintitle">
+              	异常日志查询
+          </div>
+            <div class="tleft">
+                <div class="ibeinfo">
+                <div class="inputinfo">
+                    <div class="infotitle">输入信息</div>
+                  <div class="inputdiv">
+                            <span class="sleft">日期</span>
+                            <span class="sright"><input type="text" class="date" name="info.logdate" id="logTime"/></span>
+                            <span class="sright">
+                            	<select id="hour" name="info.hour">
+                            		<option value="" selected="selected">时</option>
+                            		<option>00</option>
+                            		<option>01</option>
+                            		<option>02</option>
+                            		<option>03</option>
+                            		<option>04</option>
+                            		<option>05</option>
+                            		<option>06</option>
+                            		<option>07</option>
+                            		<option>08</option>
+                            		<option>09</option>
+                            		<option>10</option>
+                            		<option>11</option>
+                            		<option>12</option>
+                            		<option>13</option>
+                            		<option>14</option>
+                            		<option>15</option>
+                            		<option>16</option>
+                            		<option>17</option>
+                            		<option>18</option>
+                            		<option>19</option>
+                            		<option>20</option>
+                            		<option>21</option>
+                            		<option>22</option>
+                            		<option>23</option>
+                            	</select>
+							</span>
+                  </div>
+                    <div class="inputdiv">
+                        <span class="sleft">AppName</span>
+                        <span class="sright"><input type="text" name="info.appname" value="" id="appname"/></span>
+                  </div>
+                    <div class="inputdiv">
+                        <span class="sleft">ID code</span>
+                        <span class="sright"><input class="idcodeinput" type="text" name="info.id" value="" id="onlyid"/></span>
+                  </div>
+                </div> 
+                </div>              
+                            
+                <div class="infotitle" >
+                    <input onclick="queryFromDatabase()" class="submitButton" type="button" value="查询" id="cleanid" />
+                </div>
+          </div>
+                 
+          <div class="bigsysteminfo">
+          <div class="systitle">系统信息</div>
+                    <div class="systeminfo" id="sysinfo">
+                    </div>
+          </div>
+      </div>
+          <div class="bigright">
+        	  <a class="a_config" href="config.jsp">后台配置</a>
+                <div class="tright">
+                	<div class="bttitle">HAS 异常信息</div>
+                    <textarea  class="einfo" id="hasmsg"></textarea >
+                    <div class="bttitle">IBE 异常信息</div>
+                    <textarea  class="ibeinfomsg" id="ibemsg"></textarea > 
+                    <div class="msg" id="msg"></div>
+            	</div>
+      		</div>
+     </div>
+    </form> 
+</body>
+</html>

@@ -1,0 +1,90 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript" src="jquery/jquery-1.7.2.min.js"></script>
+<script type="text/javascript">
+
+function add(){
+	$.ajax({
+		url:"redis/radd.action",
+		type:"post",
+		contentType:"application/x-www-form-urlencoded; charset=utf-8",
+		data:{
+			"ibeHasLogInfo.id":$("#iid").val(),
+			"ibeHasLogInfo.onlyid":$("#ionlyid").val(),
+			"ibeHasLogInfo.hasInfo":$("#ihasInfo").val(),
+			"ibeHasLogInfo.ibeInfo":$("#iibeInfo").val(),
+			"ibeHasLogInfo.createTime":$("#icreatetime").val(),
+			"ibeHasLogInfo.appname":$("#iappname").val()
+		},
+		beforeSend:function(){
+			return true;
+		},
+		success:function(jsonObject){
+			if(jsonObject.success){
+				alert("add success!!!")
+			}else{
+				alert("add fail!!!");
+			}
+		}
+	});
+}
+
+
+function query(){
+	$.ajax({
+		url:"redis/rquery.action",
+		type:"post",
+		contentType:"application/x-www-form-urlencoded; charset=utf-8",
+		data:{
+			"id":$("#queryid").val(),
+		},
+		beforeSend:function(){
+			return true;
+		},
+		success:function(jsonObject){
+			if(jsonObject.success){
+				$("#ibe").html(jsonObject.ibeInfo);
+				$("#has").html(jsonObject.hasInfo);
+			}else{
+				alert("query fail!!!");
+			}
+		}
+	});
+}
+
+
+</script>
+
+</head>
+<body>
+INPUT TO REDIS<br>
+	id:<input id="iid" name="ibeHasInfo.id"/><br/>
+	onlyid:<input id="ionlyid" name="ibeHasInfo.onlyid"/><br/>
+	ibeInfo:<input id="iibeInfo" name="ibeHasInfo.ibeInfo"/><br/>
+	hasInfo:<input id="ihasInfo" name="ibeHasInfo.hasInfo"/><br/>
+	createtime:<input id="icreatetime" name="ibeHasInfo.createTime"/><br/>
+	appname:<input id="iappname" name="ibeHasInfo.appname"/><br/>
+	<input id="addbtn" type="button" id="btn" onclick="add()" value="submit!">
+<div style="border-bottom: solid 1px red;"></div>
+
+<br>
+Read Redis!!!!!!!!!!!!!!
+<br>
+<div>
+input id:<input id="queryid" type="text" /><br>
+id: <span id="id"></span><br>
+createTime: <span id="time"></span><br>
+appname: <span id="app"></span><br>
+onlyid: <span id="only"></span><br>
+ibeInfo: <span id="ibe"></span><br>
+hasinfo: <span id="has"></span><br>
+<input type="button" onclick="query()" value="submit!" />
+</div>
+
+</body>
+</html>

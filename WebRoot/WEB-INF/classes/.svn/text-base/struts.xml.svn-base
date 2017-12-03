@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+
+		<!--指定字符集编码，解决post请求中文乱码，get这种方式解决不了  -->
+	<constant name="struts.i18n.encoding" value="UTF-8"></constant>
+	<!--为了得到更好的struts异常报告 -->
+	<constant name="struts.devMode" value="true"></constant>
+	<!-- 国际化文件发生改变自动加载 -->
+	<constant name="struts.i18n.reload" value="true"></constant>
+	<!-- struts的配置文件发生改变重新加载 -->
+	<constant name="struts.configuration.xml.reload" value="true"></constant>
+
+	<package name="findinfo" namespace="/findinfo" extends="struts-default">
+		<action name="find" class="com.travelsky.fe.action.InfoAction" method="findExceptionAction">
+		</action>
+	</package>
+
+	<package name="findconfig" namespace="/findconfig" extends="struts-default">
+		<action name="config" class="com.travelsky.fe.action.ConfigAction" method="findConfigAction">
+		</action>
+	</package>
+
+</struts>

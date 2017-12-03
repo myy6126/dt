@@ -1,0 +1,411 @@
+package com.travelsky.fe.action;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.Namespace;
+import org.apache.struts2.convention.annotation.Result;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
+
+import com.travelsky.fe.VO.InfoVO;
+import com.travelsky.fe.VO.InfosVO;
+import com.travelsky.fe.model.HasInfo;
+import com.travelsky.fe.model.IbeInfo;
+import com.travelsky.fe.model.IpServerInfo;
+import com.travelsky.fe.service.ConfigService;
+import com.travelsky.fe.util.DateUtil;
+
+@Controller
+@Namespace("/config")
+@Scope("prototype")
+public class ConfigAction extends BaseAction {
+
+	private static final long serialVersionUID = 1L;
+	
+	private String id;
+	
+	private InfoVO infoVO;
+	private InfosVO infosVO;
+	
+	private IbeInfo ibeInfo;
+	private HasInfo hasInfo;
+	private IpServerInfo IpServerInfo;
+
+	
+	/**
+	 * configService
+	 */
+	@Resource(name="configService")
+	private ConfigService configService;
+	
+	
+	public InfosVO getInfosVO() {
+		return infosVO;
+	}
+
+	public void setInfosVO(InfosVO infosVO) {
+		this.infosVO = infosVO;
+	}
+
+	public IbeInfo getIbeInfo() {
+		return ibeInfo;
+	}
+
+	public void setIbeInfo(IbeInfo ibeInfo) {
+		this.ibeInfo = ibeInfo;
+	}
+
+	public HasInfo getHasInfo() {
+		return hasInfo;
+	}
+
+	public void setHasInfo(HasInfo hasInfo) {
+		this.hasInfo = hasInfo;
+	}
+
+	public IpServerInfo getIpServerInfo() {
+		return IpServerInfo;
+	}
+
+	public void setIpServerInfo(IpServerInfo ipServerInfo) {
+		IpServerInfo = ipServerInfo;
+	}
+
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	public InfoVO getInfoVO() {
+		return infoVO;
+	}
+
+	public void setInfoVO(InfoVO infoVO) {
+		this.infoVO = infoVO;
+	}
+	
+	/**
+	 * 页面跳转 config.jsp
+	 * @return
+	 * @throws Exception
+	 */
+	@Action(value="config",results={@Result(location="/WebRoot/config.jsp")})
+	public String edit()throws Exception{
+		return SUCCESS;
+	}
+	
+	/**
+	 * 查询一条
+	 * @return
+	 * @throws Exception
+	 */
+	@Action("queryOne")
+	public String queryOne() throws Exception{
+		int pageNo = 0;
+		 Map<String,Object> ipPageNoMap = new HashMap<String,Object>();
+		 Map<String,Object> namePageNoMap = new HashMap<String,Object>();
+		 Map<String,Object> jsonMap = new HashMap<String,Object>();
+		 try {
+			List<IpServerInfo> isiList = configService.queryAll();
+			for(int i=0;i<isiList.size();i++){
+				ipPageNoMap.put(isiList.get(i).getServerIp(),i);
+				namePageNoMap.put(isiList.get(i).getServerName(),i);
+			}
+			if("".equals(infoVO.getSearchIp())&&"".equals(infoVO.getSearchName())){
+				pageNo = infoVO.getPageNo() - 1;
+			}else{
+				if(!"".equals(infoVO.getSearchIp())){
+					pageNo = Integer.parseInt(ipPageNoMap.get(infoVO.getSearchIp()).toString());
+				}
+				if(!"".equals(infoVO.getSearchName())){
+					pageNo = Integer.parseInt(namePageNoMap.get(infoVO.getSearchName()).toString());
+				}
+			}
+			jsonMap.put("pageNo", pageNo);
+			jsonMap.put("success", true);
+		} catch (Exception e) {
+			e.printStackTrace();
+			jsonMap.put("success", false);
+		}
+		return jsonOut(jsonMap);
+	}
+	
+	/**
+	 * 查询所有
+	 * @return
+	 * @throws Exception
+	 */
+	@Action("queryall")
+	public String queryAllIpServer() throws Exception{
+		
+		 String serverName;
+		 String ip;
+		 String ipServerId;
+		 List<Map<String,Object>> dataIbeList;
+		 List<Map<String,Object>> dataHasList;
+		 Map<String,Object> jsonMap = new HashMap<String,Object>();
+		 try {
+			List<IpServerInfo> isiList = configService.queryAll();
+			Long count = configService.queryIpServerConut();
+			int pageNo = infoVO.getPageNo() - 1;
+			IpServerInfo ipServerInfo = isiList.get(pageNo);
+			serverName = ipServerInfo.getServerName();
+			ip = ipServerInfo.getServerIp();
+			ipServerId = ipServerInfo.getServerIpNO();
+			List<IbeInfo> ibeList = configService.queryIbeByIp(ip);
+			List<HasInfo> hasList = configService.queryHasByIp(ip);
+			dataIbeList = new ArrayList<Map<String, Object>>();
+			dataHasList = new ArrayList<Map<String, Object>>();
+			for (IbeInfo ibeInfo : ibeList) {
+				Map<String, Object> map = new HashMap<String, Object>();
+				map.put("ibeid", ibeInfo.getId());
+				map.put("ibeip", ibeInfo.getIp());
+				map.put("ibeusername", ibeInfo.getUsername());
+				map.put("ibepassword", ibeInfo.getPassword());
+				map.put("ibepath", ibeInfo.getPath());
+				dataIbeList.add(map);
+			}
+			for (HasInfo hasInfo : hasList) {
+				Map<String, Object> map = new HashMap<String, Object>();
+				map.put("hasid", hasInfo.getId());
+				map.put("hasip", hasInfo.getIp());
+				map.put("hasusername", hasInfo.getUsername());
+				map.put("haspassword", hasInfo.getPassword());
+				map.put("haspath", hasInfo.getPath());
+				map.put("sihhaspath", hasInfo.getSihPath());
+				dataHasList.add(map);
+			}
+			jsonMap.put("ibeDataList", dataIbeList);
+			jsonMap.put("hasDataList", dataHasList);
+			jsonMap.put("serverip", ip);
+			jsonMap.put("servername", serverName);
+			jsonMap.put("total", count);
+			jsonMap.put("ipServerId", ipServerId);
+			jsonMap.put("success", true);
+		} catch (Exception e) {
+			jsonMap.put("success", false);
+		}
+		return jsonOut(jsonMap);
+	}
+	
+	/**
+	 * 添加ibe信息
+	 * @return
+	 * @throws Exception
+	 */
+	@Action("addibeinfo")
+	public String addIbeInfo() throws Exception{
+		ibeInfo.setCreateTime(DateUtil.getSystemTime());
+		ibeInfo.setServerIp(infoVO.getIpserver());
+		configService.addIbeInfoService(ibeInfo);
+		return null;
+	}
+	
+	/**
+	 * 添加has信息
+	 * @return
+	 * @throws Exception
+	 */
+	@Action("addhasinfo")
+	public String addHasInfo() throws Exception{
+		hasInfo.setCreateTime(DateUtil.getSystemTime());
+		hasInfo.setServerIp(infoVO.getIpserver());
+		configService.addHasInfoService(hasInfo);
+		return null;
+	}
+	
+	/**
+	 * 添加ibe和has信息
+	 * @return
+	 * @throws Exception
+	 */
+	@Action("addibehasinfo")
+	public String addIbeHasInfo() throws Exception{
+		Map<String,Object> jsonMap = new HashMap<String,Object>();
+		try {
+			configService.addIbesOrHassService(infosVO);
+			jsonMap.put("success", true);
+		} catch (Exception e) {
+			jsonMap.put("success", false);
+		}
+		return jsonOut(jsonMap);
+	}
+	
+	/**
+	 * 删除信息
+	 * @return
+	 * @throws Exception
+	 */
+	@Action("delInfo")
+	public String deleteInfo() throws Exception{
+		Map<String,Object> jsonMap = new HashMap<String,Object>();
+		String arrString = infosVO.getIds();
+		String arrString1 = arrString.substring(1, arrString.length()-1);
+		String[] arr = arrString1.split(",");
+		String ibeOrHasOrIpServer = infosVO.getIbeOrHasOrIpServer();
+		try {
+				if(ibeOrHasOrIpServer.equals("ibeInfo")){
+					for(int i=0;i<arr.length;i++){
+						configService.deleteIbeInfoById(arr[i]);
+					}
+					jsonMap.put("success", true);
+				}
+				if(ibeOrHasOrIpServer.equals("hasInfo")){
+					for(int i=0;i<arr.length;i++){
+						configService.deleteHasInfoById(arr[i]);
+					}
+					jsonMap.put("success", true);
+				}
+				if(ibeOrHasOrIpServer.equals("ipServerInfo")){
+					configService.deleteIpServerInfoById(arrString1);
+					jsonMap.put("success", true);
+				}
+		} catch (Exception e) {
+				e.printStackTrace();
+				jsonMap.put("success", false);
+		}
+		return jsonOut(jsonMap);
+	}
+	
+	/**
+	 * 添加所有
+	 * @return
+	 * @throws Exception
+	 */
+	@Action("addAll")
+	public String addAll() throws Exception{
+		Map<String,Object> jsonMap = new HashMap<String,Object>();
+		try {
+			configService.addIpServersOrIbesOrHassService(infosVO);
+			jsonMap.put("success", true);
+		} catch (Exception e) {
+			jsonMap.put("success", false);
+		}
+		return jsonOut(jsonMap);
+	}
+	
+	/**
+	 * 去修改IBE信息页面
+	 * @return
+	 * @throws Exception
+	 */
+	@Action(value="toUpdateIbe",results={@Result(location="/updateIbe.jsp")})
+	public String toUpdateIbe() throws Exception{
+		infoVO = new InfoVO();
+		String id  = request.getParameter("id");
+		IbeInfo ibeInfo = configService.queryIbeInfoById(id);
+		infoVO.setId(id);
+		infoVO.setIp(ibeInfo.getIp());
+		infoVO.setUsername(ibeInfo.getUsername());;
+		infoVO.setPassword(ibeInfo.getPassword());
+		infoVO.setPath(ibeInfo.getPath());
+		return SUCCESS;
+	}
+	
+	/**
+	 * 去修改HAS信息页面
+	 * @return
+	 * @throws Exception
+	 */
+	@Action(value="toUpdateHas",results={@Result(location="/updateHas.jsp")})
+	public String toUpdateHas() throws Exception{
+			infoVO = new InfoVO();
+			String id  = request.getParameter("id");
+			HasInfo hasInfo = configService.queryHasInfoById(id);
+			infoVO.setId(id);
+			infoVO.setIp(hasInfo.getIp());
+			infoVO.setUsername(hasInfo.getUsername());;
+			infoVO.setPassword(hasInfo.getPassword());
+			infoVO.setPath(hasInfo.getPath());
+			infoVO.setSihPath(hasInfo.getSihPath());
+			return SUCCESS;
+	}
+	
+	/**
+	 * 修改IBE信息 
+	 * @return
+	 * @throws Exception
+	 */
+	@Action("doUpdateIbe")
+	public String doUpdateIbe() throws Exception{
+		Map<String,Object> jsonMap = new HashMap<String,Object>();
+		try {
+			configService.updateIbeServerInfo(infoVO.getId(),
+														infoVO.getIp(),
+														infoVO.getUsername(),
+														infoVO.getPassword(),
+														infoVO.getPath());
+				jsonMap.put("success", true);
+		} catch (Exception e) {
+			jsonMap.put("success", false);
+			e.printStackTrace();
+		}
+		
+		return jsonOut(jsonMap);
+	}
+	
+	/**
+	 * 修改HAS信息
+	 * @return
+	 * @throws Exception
+	 */
+	@Action("doUpdateHas")
+	public String doUpdateHas() throws Exception{
+		Map<String,Object> jsonMap = new HashMap<String,Object>();
+		try {
+			configService.updateHasServerInfo(infoVO.getId(),
+														infoVO.getIp(),
+														infoVO.getUsername(),
+														infoVO.getPassword(),
+														infoVO.getPath(),
+														infoVO.getSihPath());
+				jsonMap.put("success", true);
+		} catch (Exception e) {
+			jsonMap.put("success", false);
+			e.printStackTrace();
+		}
+		
+		return jsonOut(jsonMap);
+	}
+	
+	/**
+	 * 去修改IpServer页面
+	 * @return
+	 * @throws Exception
+	 */
+	@Action(value="toEdit",results={@Result(location="/edit.jsp")})
+	public String toEdit() throws Exception{
+		String ipServerId = request.getParameter("ipserverid");
+		IpServerInfo IpServerInfo = configService.queryIpServerById(ipServerId);
+		infosVO = new InfosVO();
+		infosVO.setIpServerInfo(IpServerInfo);
+		return SUCCESS;
+	}
+	
+	/**
+	 * 修改IpServer信息
+	 * @return
+	 * @throws Exception
+	 */
+	@Action("doEdit")
+	public String doEdit() throws Exception{
+		Map<String,Object> jsonMap = new HashMap<String,Object>();
+		try {
+			configService.updateIpServerServiceInfo(infoVO.getServerId(),
+					infoVO.getServerIp(), 
+					infoVO.getServerName());
+			jsonMap.put("success", true);
+		} catch (Exception e) {
+			jsonMap.put("success", false);
+			e.printStackTrace();
+		}
+		return jsonOut(jsonMap);
+	}
+	
+}
