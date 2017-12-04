@@ -30,18 +30,7 @@
     		<value>classpath:jdbc.properties</value>
     	</property>
     </bean>
-    
-    <!-- webService 
-    <import resource="classpath*:META-INF/cxf/cxf.xml" />
-    <import resource="classpath*:META-INF/cxf/cxf-extension-soap.xml" />
-    <import resource="classpath*:META-INF/cxf/cxf-servlet.xml" />
-	-->
-    <!--下面的class属性值一定要跟你项目中服务实现类的包路径完全一致
-    <bean id="findws" class="com.travelsky.fe.service.impl.FindLogInfoWebServiceImpl"/>
-    <jaxws:endpoint id="fws" implementor="#findws" address="/fws" />
-    -->
-    
-    
+
     <!-- 数据源 ComboPoolDataSource -->
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
     	<property name="driverClass" value="${driver}"></property>	
@@ -58,35 +47,7 @@
     
     </bean>
     
-    <!-- ********************************* 缓 存 ************************************** -->
-    
-   <!--  <bean id="jedisPool" class="redis.clients.jedis.JedisPool">
-		<constructor-arg name="host" value="${redis.host}"></constructor-arg>
-		<constructor-arg name="port" value="${redis.port}"></constructor-arg>
-	</bean> -->
-    
-    <!-- <context:property-placeholder location="classpath:redis.properties" />   -->
-    <!-- 缓存池设置 -->
-    
-    <!--  <bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig">  
-        <property name="maxIdle" value="${redis.maxIdle}" ></property>  
-        <property name="maxActive" value="${redis.maxActive}" ></property>  
-        <property name="maxWait" value="${redis.maxWait}" ></property>  
-        <property name="testOnBorrow" value="${redis.testOnBorrow}" ></property>  
-    </bean> 
-    
-    
-   	 连接缓存 
-    <bean id="connectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory"  
-        p:host-name="${redis.host}" p:port="${redis.port}" p:password="${redis.pass}"  p:pool-config-ref="poolConfig"/>  
-      
-    <bean id="redisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">  
-        <property name="connectionFactory"   ref="connectionFactory" />  
-    </bean>  -->
-    
-    <!-- ********************************* 缓 存 ************************************** -->
-    
- 
+
     
     <!-- 数据源信息，hibernate配置信息 -->
    	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
