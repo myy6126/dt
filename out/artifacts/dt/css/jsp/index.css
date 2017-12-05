@@ -1,0 +1,68 @@
+body{ margin:0;background-color:#F0F0F0; position:relative}
+input{ background-color: null; width:144px; height:20px}
+.idcodeinput{ width:200px}
+html,body{ 
+margin:0px; 
+height:100%; 
+} 
+
+.msg{ color:red; font-size: 14px;font-family: Microsoft YaHei}
+.bigsysteminfo{ overflow:auto; width:310px; position:absolute; left:86px; top:426px}
+
+/*******************查询按钮********************/
+.submitButton{ width:60px; height:35px; font-family:Microsoft YaHei; font-size:16px; font-weight:bold; color:#333; margin-top:10px}
+.submitButtonStart{color:#868e98}
+
+/*.tbody{ margin:0 auto; height:800px; width:1000px;}*/
+.head{ width:900px; height:120px;}
+.einfo{ width:680px; height:260px; background-color:#FFF; margin-top:5px; border:1px solid #666; overflow:auto; margin-bottom:20px;
+	  	font-size: 14px; font-family:Microsoft YaHei;
+		}
+
+/**********        左右模块   ******************/
+
+.bigleft{ float:left; width:460px; background-color:#2d3e50; position:absolute;height:105%; top:-16px}
+.bigright{ float:left; width:800px;  margin-left:500px;position:absolute}
+
+.tleft{ float:left ; width:300px; margin-top:50px; margin-left:80px}
+.tright{ float:left; width:700px;margin-top:40px; margin-left:60px}
+
+/**********      文字输入框模块      **************/
+.sleft{ float:left;display:block ;text-align:right; width:80px; margin-top:1px; color:#ededef; font-size:16px; font-weight:bold; font-family:Microsoft YaHei}
+.sright{ float:left;display:block ;text-align:left; margin-left:9px}
+.inputdiv{ height:40px; width:350px}
+
+.infotitle{ margin-bottom:20px; text-align:center; font-family:Microsoft YaHei; font-size:18px ; color:#ededef}
+
+.bttitle{ color:#455964; font-family:Microsoft YaHei; font-size:16px; margin-left:8px; font-weight: bold}
+
+.systitle{ color:#FFF; font-family:Microsoft YaHei; font-size:16px; margin-left:8px}
+
+.systeminfo{ width:300px; height:100px; margin-top:5px; border:1px solid #f2f2f2; overflow:auto;font-size:12px;font-family: Microsoft YaHei;color: red; background-color:#FFF;}
+
+.ibeinfomsg{ width:680px; height:200px; background-color:#FFF; margin-top:5px; border:1px solid #666; overflow:auto;font-size: 14px;font-family:Microsoft YaHei;}
+
+/*** 左侧主标题     ******************/
+.maintitle{ float:left; font-family:Microsoft YaHei; font-size:26px; color:#ededef; margin-left:158px; margin-top:50px; font-weight:bold}
+
+
+/*****       a标签           ****************/
+.a_config{font-size:16px; color:#2d3e50; font-family:Microsoft YaHei; font-weight:bold;display:block; text-decoration:none; width:65px; position:absolute; left:670px; top:26px}
+
+.a_config:hover{ border-bottom: 1px solid #2d3e50;}
+
+.a_config_left{
+	font-size: 16px;
+	color: #FFF;
+	font-family: Microsoft YaHei;
+	font-weight: bold;
+	display: block;
+	text-decoration: none;
+	width: 65px;
+	position: absolute;
+	left: 204px;
+	top: 520px
+}
+
+.a_config_left:hover{ border-bottom:1px solid #FFFFFF; }
+

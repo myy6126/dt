@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sys-data>
+
+
+	<!-- 组织机构信息 -->
+	<permission-info>
+		<permission id="1" name="学生模块" icon="icon-leaf" pid="0"/>
+			<permission id="11" name="学生管理" module-url="/stu/index.action" operation-url="stu/add.action,stu/toEdit.action,stu/doEdit.action,stu/update.action" pid="1"/>
+			<permission id="12" name="轮转信息" module-url="/clinicalRotation/index.action" operation-url="clinicalRotation/add.action,clinicalRotation/toEdit.action,clinicalRotation/doEdit.action,clinicalRotation/update.action" pid="1"/>
+			<permission id="13" name="学生成绩" module-url="/score/index.action" operation-url="score/add.action,score/toEdit.action,score/doEdit.action,score/update.action" pid="1"/>
+		<permission id="2" name="权限模块" icon="icon-user" pid="0"/>
+			<permission id="21" name="用户管理" module-url="/user/index.action" operation-url="user/add.action,user/toEdit.action,user/doEdit.action,user/update.action" pid="2"/>
+			<permission id="22" name="角色管理" module-url="/role/index.action" operation-url="role/add.action,role/toEdit.action,role/doEdit.action,role/update.action" pid="2"/>
+			<permission id="23" name="权限管理" module-url="/permission/index.action" operation-url="permission/add.action,permission/toEdit.action,permission/doEdit.action,permission/update.action" pid="2"/>
+		<permission id="3" name="日志模块" icon="icon-list" pid="0"/>
+			<permission id="31" name="日志模块" module-url="/operationlog/index.action" operation-url="operationlog/add.action,operationlog/toEdit.action,operationlog/doEdit.action,operationlog/update.action" pid="3"/>
+			<permission id="4" name="公告模块" icon="icon-envelope" pid="0"/>
+			<permission id="41" name="公告模块" module-url="/announcement/index.action" operation-url="announcement/add.action,announcement/toEdit.action,announcement/doEdit.action,announcement/update.action" pid="4"/>
+	</permission-info>
+
+	<!-- 角色信息 -->
+	<role-info>
+		<role id="001" name="超级管理员" type="1"/>
+	</role-info>
+	
+	<!-- 用户信息 -->
+	<user-info>
+		<user username="admin" password="admin" privilege="001" status="1"/>
+	</user-info>
+	
+	<!-- 配置信息 -->
+	<config-info>
+		<config id="001" name="crindex" value="1"/>
+	</config-info>
+
+	<!-- 配置信息 -->
+	<role-permission-info>
+		<role-permission id="2c9b8d955a273ac8015a273d921c0002" permission-id="1" role-id="001"/>
+		<role-permission id="2c9b8d955a273ac8015a273d92200003" permission-id="11" role-id="001"/>
+		<role-permission id="2c9b8d955a273ac8015a273d92230004" permission-id="12" role-id="001"/>
+		<role-permission id="2c9b8d955a273ac8015a273d92250005" permission-id="13" role-id="001"/>
+		<role-permission id="2c9b8d955a273ac8015a273d92270006" permission-id="2" role-id="001"/>
+		<role-permission id="2c9b8d955a273ac8015a273d921c0002" permission-id="21" role-id="001"/>
+		<role-permission id="2c9b8d955a273ac8015a273d92290007" permission-id="22" role-id="001"/>
+		<role-permission id="2c9b8d955a273ac8015a273d922a0008" permission-id="23" role-id="001"/>
+		<role-permission id="2c9b8d955a273ac8015a273d922c0009" permission-id="3" role-id="001"/>
+		<role-permission id="2c9b8d955a273ac8015a273d922e0e0a" permission-id="31" role-id="001"/>
+		<role-permission id="2c9b8d955a273ac8015a273d9231000c" permission-id="4" role-id="001"/>
+		<role-permission id="2c9b8d955a273ac8015a273d9233000d" permission-id="41" role-id="001"/>
+	</role-permission-info>
+		
+	<user-role-info>
+		<user-role id="2c9b8d955a273ac8015a273d9233000a" role-id="001" username= "admin"/>
+	</user-role-info>	
+		
+	<!-- 配置信息 -->
+	<config-info>
+		<config id="001" name="crindex" value="1"/>
+	</config-info>
+	
+	
+</sys-data>
