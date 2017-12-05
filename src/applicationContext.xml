@@ -33,17 +33,18 @@
 
     <!-- 数据源 ComboPoolDataSource -->
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
-    	<property name="driverClass" value="${driver}"></property>	
-    	<property name="jdbcUrl" value="${url}"></property>	
-    	<property name="user" value="${user}"></property>	
-    	<property name="password" value="${password}"></property>	
-	    
-		<property name="maxPoolSize" value="30" />
-		<property name="minPoolSize" value="10" />
-		<property name="maxIdleTime" value="1800" />
-		<property name="maxStatements" value="0" />
-		<property name="initialPoolSize" value="10" />
-		<property name="idleConnectionTestPeriod" value="1800" />
+		<property name="jdbcUrl" value="${dt.jdbc.url}"/>
+		<property name="driverClass" value="${dt.jdbc.driverClassName}"/>
+		<property name="user" value="${dt.jdbc.username}"/>
+		<property name="password" value="${dt.jdbc.password}"/>
+		<property name="initialPoolSize" value="${dt.jdbc.initialPoolSize}"/>
+		<property name="minPoolSize" value="${dt.jdbc.minPoolSize}"/>
+		<property name="maxPoolSize" value="${dt.jdbc.maxPoolSize}"/>
+		<property name="maxStatements" value="${dt.jdbc.maxStatements}"/>
+		<property name="autoCommitOnClose" value="${dt.jdbc.autoCommitOnClose}"/>
+		<property name="idleConnectionTestPeriod" value="${dt.jdbc.idleConnectionTestPeriod}"/>
+		<property name="maxIdleTime" value="${dt.jdbc.maxIdleTime}"/>
+		<property name="testConnectionOnCheckout" value="true"/>
     
     </bean>
     
